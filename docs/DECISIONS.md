@@ -36,15 +36,17 @@ The original was one HTML file. It had all the CSS and JavaScript inline, and it
 
 ## Step 2: Database design (`server/src/schema.sql`)
 
-Six tables:
+Eight tables:
 
 | Table | Purpose |
 |---|---|
-| `products` | The 9 seeded products, including the `eta` delivery estimate |
+| `products` | The 9 seeded products, with delivery estimate (`eta_min`/`eta_max` business days) and real `stock` |
 | `users` | Customers and admins, with the password stored as a bcrypt hash, a `role`, and the timestamp of their privacy consent |
 | `mfa_challenges` | One-time 2FA codes (hashed), with expiry time and attempt counter |
 | `orders` | One row per order. `user_id` is NULL for guest checkout. |
 | `order_items` | The products in each order (one-to-many from `orders`) |
+| `order_status_history` | Timeline of every status change for each order (added in Step 8) |
+| `return_requests` | Self-service returns and problem reports (added in Step 8) |
 | `events` | Web-analytics log (visit, add to cart, checkout start, consent, order) |
 
 Key decisions:
@@ -201,27 +203,64 @@ Inputs have `<label htmlFor>`, the MFA dialog has `role="dialog"`, toasts use `a
 
 ## Step 7: Testing performed
 
-End-to-end tests were run against the running app (API calls plus an automated browser):
+Testing was run as a loop: build, test, fix whatever failed, then run everything again until it all passed.
 
-| Test | Result |
+**1. Automated API tests: `npm test` (15 tests, all passing).** File: `server/test/api.test.js`. They start the real server against a throw-away database and check:
+
+| Test | Expected result |
 |---|---|
-| 9 products load; category and search filters work | ✅ |
-| Order without consent | ✅ Rejected by the browser **and** the server |
-| Add-on and consent checkboxes start unticked | ✅ |
-| Tampered price in request (`"price": 1`) | ✅ Ignored; correct total charged |
-| Add-on sent as `"yes"` instead of `true` | ✅ Not added |
-| Invalid card number (fails Luhn) / declined test card | ✅ Rejected with a clear message |
-| Payment token reused | ✅ Rejected |
-| Wrong MFA code | ✅ Rejected, attempts counted down |
-| Customer tries admin API | ✅ 403 |
-| Not signed in, tries admin API | ✅ 401 |
-| Guest tracking with the wrong email | ✅ Not found |
-| Security headers present (CSP, nosniff, frame protection) | ✅ |
-| `npm install` security audit | ✅ 0 vulnerabilities |
+| Order without privacy consent | Rejected (400) |
+| Tampered price in request (`"price": 1`) | Ignored; correct total charged |
+| Add-on sent as `"yes"` instead of `true` | Not added |
+| Invalid card (fails Luhn), declined card, expired card | Rejected |
+| Payment token reused | Rejected (402) |
+| Buying an out-of-stock item, or more than the stock | Rejected (409); stock decrements after a sale |
+| Express delivery to a remote postcode, invalid postcodes | Rejected |
+| Tracking with the wrong email | Not found (404) |
+| Second open return request for the same order | Rejected (409) |
+| Common password (`password123`), missing consent, duplicate email | Rejected |
+| Unknown email vs wrong password | **Identical** error messages |
+| MFA: wrong code, reused code | Rejected; session cookie is `HttpOnly` + `SameSite=Strict` |
+| Guest / customer on admin routes; forged cookie | 401 / 403 / treated as guest |
+| Order status going backwards | Rejected |
+| Data export | Contains no password hash |
+| Account deletion with the wrong password | Rejected |
+| Security headers, malformed JSON, 20 KB body | CSP present, 400, 413 |
+
+**2. Browser end-to-end test (37 checks, all passing).** An automated Chromium browser shops the site like a customer: browse, filter, search, estimate delivery, save items, try to exceed stock, check out (including trying without consent), track the order, report damage, sign in as admin with MFA, dispatch the order, register a customer, fail MFA once, download their data and delete the account. It also checks that phones (390 px wide) never get a sideways scrollbar.
+
+**3. Accessibility audit: 0 violations on all 13 pages.** The browser test runs **axe-core** (the industry-standard checker) against WCAG 2.1 A/AA and best-practice rules on every page. The first run found real problems, and all were fixed:
+- headings skipped levels
+- links in text were identified only by colour (they're now underlined)
+- the announcement bar was outside a landmark
+- clickable text was not reachable by keyboard (now real buttons and links)
+- category links overflowed on phones (a bug also present in the original design)
+
+Visible keyboard focus, a "Skip to main content" link and reduced-motion support were also added.
+
+An interesting finding: the test tool's attempt to inject its own script was **blocked by our Content-Security-Policy**. That's exactly how the CSP protects real users from injected scripts. (The test browser had to be told to bypass it.)
+
+**4. `npm audit`: 0 known vulnerabilities in dependencies.**
 
 ---
 
-## Step 8: Known limitations (be upfront about these in your presentation)
+## Step 8: Beating the real Temple & Webster site
+
+The full comparison, with sources, is in [`COMPETITOR-ANALYSIS.md`](COMPETITOR-ANALYSIS.md). In short, the real site's reviews complain about **uncertainty**: surprise delivery costs, rejected postcodes, split deliveries, "in stock" items that weren't, and chasing couriers for updates. Each feature below targets one of those complaints:
+
+| Feature | Decision and reasoning |
+|---|---|
+| **Delivery estimator** (`server/src/delivery.js`) | The postcode is mapped to a zone (metro / regional / remote) using Australian postcode ranges. Each product has an `eta_min`/`eta_max` in business days, the zone adds days, and a weekend-skipping calculation turns that into **real dates**. It is computed on the server so the product page, cart, checkout and the saved order all agree. |
+| **Honest stock** | A `stock` column plus a guarded `UPDATE products SET stock = stock - ? WHERE id = ? AND stock >= ?` inside the order transaction. If two customers race for the last item, only one update matches and the other order rolls back, so it's impossible to oversell. |
+| **Deliver together** | The cart detects when items have different delivery windows. Customers can opt in (unticked by default, free) to one delivery on the latest date. The server ignores the option when it doesn't apply. |
+| **Order timeline** | A new `order_status_history` table logs every status with a timestamp and note. Statuses can only move forward. Each change is "sent" to the customer (mock email/SMS), so they never need to chase. |
+| **Self-service returns** | `return_requests` table. The server decides the reply based on the Australian Consumer Law: damaged or faulty goods get free pickup plus a replacement or refund. Change of mind is allowed within 30 days, with a refund to the original payment method. Only one open request per order is allowed. |
+| **Privacy centre** | *Download my data* implements APP 12 (access). *Delete my account* implements APP 11.2 (destroy what's no longer needed). It needs the password again. Order records are kept (unlinked) because tax law requires 5 years. |
+| **Leaked-password blocking** | Following NIST SP 800-63B: block known-bad passwords rather than force awkward symbol rules. |
+| **Analytics link hidden for non-admins** | The server already blocks them (401/403). Hiding the link simply avoids showing customers a page they can't use. |
+| **Schema versioning** | `PRAGMA user_version` records the schema version, so an older database file is rebuilt automatically after an upgrade. |
+
+## Step 9: Known limitations (be upfront about these in your presentation)
 
 | Limitation | What production would do |
 |---|---|
@@ -233,3 +272,5 @@ End-to-end tests were run against the running app (API calls plus an automated b
 | Rate limits and payment tokens are kept in memory | Redis, so they're shared across multiple servers |
 | No email verification at registration | Send a verification link before activating the account |
 | Product images are emoji (as in the original design) | Real photography served from a CDN |
+| Postcode zones are a simplified table; public holidays aren't counted | The carrier's zone file / API and a state holiday calendar |
+| Status updates and notifications are triggered manually by an admin | Courier tracking webhooks update statuses automatically |
