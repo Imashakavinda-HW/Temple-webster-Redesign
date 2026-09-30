@@ -1,0 +1,17 @@
+{
+  "name": "temple-webster-secure-prototype",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Secure e-commerce prototype for Temple & Webster (React + Express + SQLite)",
+  "workspaces": ["server", "client"],
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "dev": "concurrently -n api,web -c yellow,cyan \"npm run dev -w server\" \"npm run dev -w client\"",
+    "build": "npm run build -w client",
+    "start": "npm start -w server",
+    "seed": "npm run seed -w server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

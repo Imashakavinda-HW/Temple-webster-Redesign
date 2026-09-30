@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temple &amp; Webster — Premium Secure Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#12100e; --paper:#0f0d0c; --cream:#f4efe7; --sand:#e8ddca;
+    --gold:#c8a45c; --gold-soft:#d9bd82; --muted:#9a9187; --line:#2a2622;
+    --line-lt:#e2d8c8; --card:#1a1714; --ok:#7bbf8f; --warn:#d98a5a;
+    --r:4px; --shadow:0 20px 60px rgba(0,0,0,.45);
+    --serif:"Cormorant Garamond",Georgia,serif; --sans:"Inter",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:var(--sans);color:var(--cream);background:var(--paper);
+       line-height:1.6;font-weight:300;letter-spacing:.01em;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none;cursor:pointer}
+  img{max-width:100%;display:block}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  .serif{font-family:var(--serif)}
+  ::selection{background:var(--gold);color:#12100e}
+  /* announcement */
+  .ann{background:#000;color:var(--gold-soft);text-align:center;font-size:12px;letter-spacing:.18em;
+       text-transform:uppercase;padding:9px;font-weight:500}
+  .ann b{color:var(--cream)}
+  /* header */
+  header.top{background:rgba(15,13,12,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);
+             position:sticky;top:0;z-index:60}
+  .topbar{display:flex;align-items:center;gap:26px;padding:20px 0}
+  .logo{font-family:var(--serif);font-weight:700;font-size:26px;letter-spacing:.04em;line-height:1}
+  .logo em{font-style:normal;color:var(--gold)}
+  .logo small{display:block;font-family:var(--sans);font-size:9px;letter-spacing:.42em;
+              color:var(--muted);text-transform:uppercase;margin-top:3px;font-weight:400}
+  .search{flex:1;position:relative}
+  .search input{width:100%;padding:12px 18px;background:transparent;border:1px solid var(--line);
+                border-radius:999px;font-size:13px;color:var(--cream);font-family:var(--sans);letter-spacing:.02em}
+  .search input::placeholder{color:var(--muted)}
+  .search input:focus{outline:none;border-color:var(--gold)}
+  .nav{display:flex;gap:22px;align-items:center;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+  .nav a{color:var(--cream);opacity:.85;transition:.2s;font-weight:400}
+  .nav a:hover{opacity:1;color:var(--gold)}
+  .cartbtn{position:relative}
+  .badge{position:absolute;top:-9px;right:-13px;background:var(--gold);color:#12100e;border-radius:999px;
+         font-size:10px;padding:1px 6px;font-weight:700}
+  .cats{display:flex;gap:32px;padding:14px 0;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+        border-top:1px solid var(--line);color:var(--muted)}
+  .cats a{transition:.2s}.cats a:hover{color:var(--gold)}
+  /* buttons */
+  .btn{background:var(--gold);color:#12100e;border:none;padding:13px 28px;border-radius:999px;
+       font-weight:600;cursor:pointer;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+       font-family:var(--sans);transition:.25s}
+  .btn:hover{background:var(--gold-soft);transform:translateY(-1px)}
+  .btn.block{width:100%}
+  .btn.ghost{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+  .btn.ghost:hover{background:var(--gold);color:#12100e}
+  .btn.line{background:transparent;border:1px solid var(--line-lt);color:var(--cream)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  /* hero */
+  .hero{position:relative;min-height:520px;border-radius:var(--r);overflow:hidden;margin:32px 0;
+        display:flex;align-items:center;
+        background:radial-gradient(120% 120% at 80% 20%,#3a2f22 0%,#1a1512 45%,#0f0d0c 100%)}
+  .hero::after{content:"";position:absolute;inset:0;
+        background:repeating-linear-gradient(135deg,transparent,transparent 40px,rgba(200,164,92,.03) 40px,rgba(200,164,92,.03) 80px)}
+  .hero-in{position:relative;z-index:2;padding:0 64px;max-width:620px}
+  .hero .eyebrow{color:var(--gold);font-size:11px;letter-spacing:.32em;text-transform:uppercase;margin-bottom:20px}
+  .hero h1{font-family:var(--serif);font-size:60px;line-height:1.05;font-weight:600;margin:0 0 20px;letter-spacing:.01em}
+  .hero p{color:var(--sand);font-size:16px;margin:0 0 30px;max-width:440px;opacity:.85}
+  /* sections */
+  .lead{display:flex;justify-content:space-between;align-items:flex-end;margin:56px 0 24px;gap:20px;flex-wrap:wrap}
+  .lead h2{font-family:var(--serif);font-size:36px;font-weight:600;margin:0;letter-spacing:.01em}
+  .lead p{color:var(--muted);font-size:13px;margin:6px 0 0}
+  .lead .link{color:var(--gold);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:28px}
+  .card{position:relative;transition:.3s}
+  .card .art{aspect-ratio:4/5;background:linear-gradient(160deg,#241f1a,#15110e);border:1px solid var(--line);
+             border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:72px;
+             position:relative;overflow:hidden;transition:.3s}
+  .card:hover .art{border-color:var(--gold);transform:translateY(-4px)}
+  .card .tag{position:absolute;top:12px;left:12px;background:rgba(15,13,12,.85);color:var(--gold);
+             font-size:9px;letter-spacing:.16em;text-transform:uppercase;padding:5px 10px;border-radius:999px;z-index:2}
+  .card .info{padding:16px 4px 0}
+  .card .nm{font-family:var(--serif);font-size:20px;font-weight:600;margin-bottom:2px}
+  .card .rt{font-size:11px;color:var(--muted);letter-spacing:.05em}
+  .card .pr{font-size:17px;font-weight:600;color:var(--gold);margin:8px 0 4px;letter-spacing:.02em}
+  .card .et{font-size:11px;color:var(--ok);letter-spacing:.04em;margin-bottom:12px}
+  /* panels (light content on dark) */
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:32px;margin:22px 0}
+  .row{display:flex;gap:32px;flex-wrap:wrap}
+  .col{flex:1;min-width:280px}
+  h3.ph{font-family:var(--serif);font-size:24px;font-weight:600;margin:0 0 4px}
+  label{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+        display:block;margin:18px 0 6px}
+  input[type=text],input[type=email],input[type=password],select,textarea{
+    width:100%;padding:13px 15px;background:#0f0d0c;border:1px solid var(--line);border-radius:var(--r);
+    font-size:14px;color:var(--cream);font-family:var(--sans);font-weight:300}
+  input:focus,select:focus{outline:none;border-color:var(--gold)}
+  select{cursor:pointer}
+  .hint{font-size:12px;color:var(--muted);margin-top:6px;letter-spacing:.02em}
+  .pill{display:inline-block;border:1px solid var(--gold);color:var(--gold);font-size:10px;font-weight:500;
+        letter-spacing:.14em;text-transform:uppercase;padding:5px 14px;border-radius:999px}
+  .secure{display:flex;align-items:center;gap:10px;background:rgba(200,164,92,.08);border:1px solid rgba(200,164,92,.3);
+          border-radius:var(--r);padding:13px 15px;font-size:12px;color:var(--gold-soft);margin:16px 0;letter-spacing:.02em}
+  .secure b{color:var(--gold)}
+  .cartline{display:flex;justify-content:space-between;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)}
+  .cartline .nm{font-family:var(--serif);font-size:19px}
+  .q{display:flex;align-items:center;gap:10px}
+  .qbtn{width:30px;height:30px;border:1px solid var(--line);background:transparent;color:var(--cream);
+        border-radius:var(--r);cursor:pointer;font-weight:600;transition:.2s}
+  .qbtn:hover{border-color:var(--gold);color:var(--gold)}
+  .totrow{display:flex;justify-content:space-between;padding:8px 0;font-size:14px}
+  .totrow.grand{font-family:var(--serif);font-weight:700;font-size:22px;color:var(--gold);
+                border-top:1px solid var(--line);margin-top:10px;padding-top:16px}
+  .consent{display:flex;gap:12px;align-items:flex-start;background:rgba(200,164,92,.06);
+           border:1px solid rgba(200,164,92,.28);border-radius:var(--r);padding:15px;margin:18px 0}
+  .consent input,.addon input{margin-top:4px;accent-color:var(--gold);width:16px;height:16px}
+  .addon{display:flex;gap:12px;align-items:flex-start;border:1px dashed var(--line);border-radius:var(--r);padding:15px;margin:14px 0}
+  .step{display:flex;gap:10px;margin-bottom:22px}
+  .step div{flex:1;text-align:center;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+            color:var(--muted);padding:11px;border-radius:var(--r);border:1px solid var(--line)}
+  .step div.on{border-color:var(--gold);color:var(--gold)}
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);
+         color:#12100e;padding:14px 26px;border-radius:999px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;
+         font-weight:600;opacity:0;transition:.35s;z-index:99;pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* value strip */
+  .values{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);
+          border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin:40px 0}
+  .values div{background:var(--paper);padding:26px;text-align:center}
+  .values .ic{font-size:26px;margin-bottom:10px}
+  .values h4{font-family:var(--serif);font-size:18px;margin:0 0 4px;font-weight:600}
+  .values p{font-size:12px;color:var(--muted);margin:0}
+  /* footer */
+  .foot{border-top:1px solid var(--line);margin-top:70px;padding:48px 0 30px;font-size:13px}
+  .foot .cols{display:flex;justify-content:space-between;flex-wrap:wrap;gap:30px}
+  .foot h4{font-family:var(--serif);font-size:18px;margin:0 0 12px;font-weight:600}
+  .foot a{color:var(--muted);display:block;margin:6px 0;transition:.2s;font-size:13px}
+  .foot a:hover{color:var(--gold)}
+  .foot .bot{border-top:1px solid var(--line);margin-top:34px;padding-top:20px;display:flex;
+             justify-content:space-between;flex-wrap:wrap;gap:12px;color:var(--muted);font-size:11px;letter-spacing:.04em}
+  /* tables/admin */
+  table.data{width:100%;border-collapse:collapse;font-size:13px}
+  table.data th,table.data td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+  table.data th{color:var(--gold);font-weight:500;font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+  .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin:20px 0}
+  .kpi .box{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .kpi .n{font-family:var(--serif);font-size:34px;font-weight:700;color:var(--gold);line-height:1}
+  .kpi .l{font-size:11px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:8px}
+  .bar{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:8px}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-soft))}
+  .modal{position:fixed;inset:0;background:rgba(10,8,7,.8);backdrop-filter:blur(6px);display:none;
+         align-items:center;justify-content:center;z-index:90;padding:20px}
+  .modal.show{display:flex}
+  .modal .panel{max-width:440px;width:100%;margin:0;box-shadow:var(--shadow)}
+  @media(max-width:720px){
+    .topbar{flex-wrap:wrap}.search{order:3;flex-basis:100%}
+    .hero{min-height:auto}.hero-in{padding:44px 28px}.hero h1{font-size:40px}
+    .lead h2{font-size:28px}
+  }
+</style>
+</head>
+<body>
+<div class="ann">Complimentary delivery over $500 &nbsp;·&nbsp; <b>4.6★</b> Trustpilot &nbsp;·&nbsp; 30-day returns under Australian Consumer Law</div>
+
+<header class="top">
+  <div class="wrap">
+    <div class="topbar">
+      <div class="logo" onclick="go('home')">Temple <em>&amp;</em> Webster<small>Fine Furniture &amp; Homewares</small></div>
+      <div class="search"><input type="text" placeholder="Search the collection…" oninput="search(this.value)"></div>
+      <nav class="nav">
+        <a onclick="go('about')">Our Story</a>
+        <a onclick="go('account')" id="navAccount">Account</a>
+        <a onclick="go('admin')">Analytics</a>
+        <a class="cartbtn" onclick="go('cart')">Cart<span class="badge" id="cartCount">0</span></a>
+      </nav>
+    </div>
+    <div class="cats">
+      <a onclick="filterCat('all')">Collection</a>
+      <a onclick="filterCat('Living')">Living</a>
+      <a onclick="filterCat('Bedroom')">Bedroom</a>
+      <a onclick="filterCat('Outdoor')">Outdoor</a>
+      <a onclick="filterCat('Décor')">Décor</a>
+      <a onclick="filterCat('Office')">Office</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<footer class="foot">
+  <div class="wrap">
+    <div class="cols">
+      <div style="max-width:260px">
+        <div class="logo" style="font-size:22px">Temple <em>&amp;</em> Webster</div>
+        <p style="color:var(--muted);font-size:13px;margin-top:12px">Australia's destination for beautiful, considered furniture — delivered securely, with care.</p>
+      </div>
+      <div><h4>Company</h4><a onclick="go('about')">Our story</a><a onclick="go('about')">Privacy Policy</a><a onclick="go('about')">Terms &amp; Conditions</a></div>
+      <div><h4>Support</h4><a onclick="go('about')">Contact us</a><a onclick="go('about')">Returns &amp; refunds</a><a onclick="go('about')">Delivery info</a></div>
+      <div><h4>Secure Shopping</h4>
+        <a>🔒 SSL / TLS encrypted</a><a>💳 PCI DSS compliant</a><a>🛡️ Privacy Act 1988</a></div>
+    </div>
+    <div class="bot"><span>© 2026 Temple &amp; Webster (demo). ABN 80 604 106 011.</span><span>Prototype for BIT363 · secure e-business solution</span></div>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<div class="modal" id="mfaModal">
+  <div class="panel">
+    <h3 class="ph">Two-Factor Verification</h3>
+    <p class="hint">For your security, we've sent a 6-digit code to your email. <span style="color:var(--gold)">(Demo code: 482913)</span></p>
+    <label>Verification code</label>
+    <input type="text" id="mfaCode" placeholder="• • • • • •" maxlength="6" style="letter-spacing:.4em;text-align:center;font-size:18px">
+    <div class="secure">🔒 <span>Multi-factor authentication protects your account from unauthorised access.</span></div>
+    <button class="btn block" onclick="verifyMfa()">Verify &amp; Sign In</button>
+    <button class="btn line block" style="margin-top:10px" onclick="closeMfa()">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ================= DATA LAYER (database, persisted in localStorage) ================= */
+const DB_KEY='tw_prem_v1';
+const seedProducts=[
+ {id:1,name:'Hamptons Slip-Cover Sofa',price:1299,cat:'Living',icon:'🛋️',eta:'5–8 business days',rate:'★ 4.7 · 212 reviews',tag:'Bestseller',desc:'A generous three-seat linen sofa on a solid timber frame. Removable, washable slip-covers in five tones.'},
+ {id:2,name:'Solid Oak Dining Table',price:899,cat:'Living',icon:'🍽️',eta:'7–10 business days',rate:'★ 4.6 · 98 reviews',tag:'',desc:'Seats six comfortably. Crafted from solid oak with a hand-rubbed natural finish.'},
+ {id:3,name:'Upholstered Linen Bed',price:749,cat:'Bedroom',icon:'🛏️',eta:'6–9 business days',rate:'★ 4.8 · 341 reviews',tag:'Editor’s Pick',desc:'A softly upholstered linen bed frame with a solid slat base — no box spring required.'},
+ {id:4,name:'Bedside Tables (Pair)',price:279,cat:'Bedroom',icon:'🗄️',eta:'4–6 business days',rate:'★ 4.5 · 76 reviews',tag:'',desc:'Two-drawer bedside tables with soft-close runners and a warm timber veneer.'},
+ {id:5,name:'Rattan Lounge Set',price:1599,cat:'Outdoor',icon:'🪑',eta:'8–12 business days',rate:'★ 4.4 · 54 reviews',tag:'',desc:'A weather-resistant four-piece rattan set with plush, quick-dry cushions.'},
+ {id:6,name:'Ceramic Table Lamp',price:129,cat:'Décor',icon:'💡',eta:'3–5 business days',rate:'★ 4.6 · 188 reviews',tag:'',desc:'A hand-thrown ceramic base beneath a natural linen shade. Warm, ambient light.'},
+ {id:7,name:'Hand-Tufted Wool Rug',price:349,cat:'Décor',icon:'🟫',eta:'4–7 business days',rate:'★ 4.7 · 156 reviews',tag:'',desc:'A dense, hand-tufted wool rug (2×3m) in a soft, neutral palette.'},
+ {id:8,name:'Ergonomic Studio Chair',price:459,cat:'Office',icon:'🪑',eta:'3–5 business days',rate:'★ 4.5 · 203 reviews',tag:'',desc:'Adjustable lumbar support and a breathable mesh back for long working days.'},
+ {id:9,name:'Electric Standing Desk',price:699,cat:'Office',icon:'🖥️',eta:'5–8 business days',rate:'★ 4.6 · 91 reviews',tag:'New',desc:'A whisper-quiet electric height-adjustable desk with memory presets (140cm).'}
+];
+function loadDB(){let d=JSON.parse(localStorage.getItem(DB_KEY)||'null');
+  if(!d){d={products:seedProducts,customers:[],orders:[],metrics:{visits:0,addToCart:0,checkoutStart:0,consentGiven:0,ordersPlaced:0}};saveDB(d);}return d;}
+function saveDB(d){localStorage.setItem(DB_KEY,JSON.stringify(d));}
+let db=loadDB(); db.metrics.visits++; saveDB(db);
+
+/* ================= STATE ================= */
+let cart=JSON.parse(localStorage.getItem('tw_prem_cart')||'[]');
+let session=JSON.parse(localStorage.getItem('tw_prem_session')||'null');
+let curFilter='all',curSearch='',pendingLogin=null;
+function persistCart(){localStorage.setItem('tw_prem_cart',JSON.stringify(cart));updateCount();}
+function updateCount(){document.getElementById('cartCount').textContent=cart.reduce((s,i)=>s+i.qty,0);}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),1900);}
+function val(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+
+/* ================= ROUTER ================= */
+function go(p,a){window.scrollTo(0,0);routes[p](a);
+  document.getElementById('navAccount').textContent=session?('Hi, '+session.name.split(' ')[0]):'Account';}
+const app=()=>document.getElementById('app');
+
+const routes={
+ home(){
+  app().innerHTML=`
+   <section class="hero"><div class="hero-in">
+     <div class="eyebrow">The Autumn Collection</div>
+     <h1>Considered pieces for a considered home.</h1>
+     <p>Over 200,000 designs from Australia's most-loved furniture destination — delivered securely, with care.</p>
+     <button class="btn" onclick="filterCat('all')">Explore the collection</button>
+   </div></section>
+   <div class="values">
+     <div><div class="ic">🔒</div><h4>Secure by design</h4><p>SSL/TLS · PCI DSS · Privacy Act 1988</p></div>
+     <div><div class="ic">🚚</div><h4>Delivery you can see</h4><p>Estimated dates on every product</p></div>
+     <div><div class="ic">↩️</div><h4>30-day returns</h4><p>Under Australian Consumer Law</p></div>
+     <div><div class="ic">💬</div><h4>After-sales care</h4><p>Dedicated support team</p></div>
+   </div>
+   <div class="lead"><div><h2 class="serif">Featured pieces</h2><p>All prices in AUD, GST included · delivery shown on every item</p></div>
+     <a class="link" onclick="filterCat('all')">View all →</a></div>
+   <div class="grid" id="grid"></div>`;
+  renderGrid();
+ },
+ product(id){
+  const p=db.products.find(x=>x.id===id);
+  app().innerHTML=`
+   <p class="hint" style="margin:24px 0"><a onclick="go('home')" style="color:var(--gold)">← Back to collection</a></p>
+   <div class="row">
+     <div class="col" style="flex:0 0 46%"><div class="art" style="aspect-ratio:1;font-size:130px;background:linear-gradient(160deg,#241f1a,#15110e);border:1px solid var(--line);border-radius:var(--r);display:flex;align-items:center;justify-content:center">${p.icon}</div></div>
+     <div class="col">
+       ${p.tag?`<span class="pill">${p.tag}</span>`:''}
+       <h2 class="serif" style="font-size:40px;font-weight:600;margin:14px 0 6px">${p.name}</h2>
+       <div class="hint" style="font-size:13px">${p.rate}</div>
+       <div style="font-family:var(--serif);font-size:34px;color:var(--gold);font-weight:700;margin:16px 0">$${p.price.toLocaleString()}</div>
+       <p style="color:var(--sand);opacity:.85">${p.desc}</p>
+       <div style="color:var(--ok);font-size:13px;margin:14px 0">🚚 Estimated delivery: ${p.eta}</div>
+       <div class="secure">🔒 <span>Secure payment · <b>PCI DSS compliant</b> · your data is protected under the Privacy Act 1988.</span></div>
+       <button class="btn block" onclick="addToCart(${p.id})">Add to cart</button>
+       <p class="hint" style="margin-top:20px;line-height:1.7"><b style="color:var(--gold-soft)">Legal &amp; ethical:</b> Free returns within 30 days under Australian Consumer Law. Supplied via our vetted supplier network and quality-checked before dispatch. No hidden fees — optional extras are always opt-in.</p>
+     </div>
+   </div>`;
+ },
+ cart(){
+  if(!cart.length){app().innerHTML=`<div class="panel" style="text-align:center;padding:60px"><h2 class="serif" style="font-size:32px">Your cart is empty</h2><p class="hint">Explore the collection to begin.</p><button class="btn" style="margin-top:16px" onclick="go('home')">Shop the collection</button></div>`;return;}
+  let sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  app().innerHTML=`
+   <div class="lead"><h2 class="serif">Your cart</h2></div>
+   <div class="row"><div class="col"><div class="panel" id="cartLines"></div></div>
+   <div class="col" style="flex:0 0 320px"><div class="panel">
+     <h3 class="ph">Summary</h3>
+     <div class="totrow"><span>Subtotal</span><span>$${sub.toLocaleString()}</span></div>
+     <div class="totrow"><span>Delivery</span><span>At checkout</span></div>
+     <div class="totrow grand"><span>Total</span><span>$${sub.toLocaleString()}</span></div>
+     <p class="hint">✓ All costs shown upfront — no pre-selected extras.</p>
+     <button class="btn block" style="margin-top:14px" onclick="go('checkout')">Proceed to checkout</button>
+   </div></div></div>`;
+  renderCartLines();
+ },
+ checkout(){
+  db.metrics.checkoutStart++;saveDB(db);
+  if(!cart.length){go('cart');return;}
+  let sub=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  app().innerHTML=`
+   <div class="step"><div class="on">1 · Details</div><div class="on">2 · Delivery</div><div class="on">3 · Payment</div></div>
+   <div class="row"><div class="col"><div class="panel">
+     <h3 class="ph">Contact details</h3>
+     ${session?`<p class="hint">Signed in as <b style="color:var(--gold-soft)">${session.email}</b></p>`:
+       `<p class="hint">Checking out as guest — no account required. <a onclick="go('account')" style="color:var(--gold)">Or sign in</a></p>
+        <label>Full name</label><input type="text" id="coName" placeholder="Jane Smith">
+        <label>Email</label><input type="email" id="coEmail" placeholder="jane@example.com">`}
+     <label>Delivery address</label><input type="text" id="coAddr" placeholder="58 Princess Ave, Springvale VIC 3171">
+     <h3 class="ph" style="margin-top:26px">Delivery</h3>
+     <select id="coDelivery">
+       <option value="0|Standard (5–8 business days)">Standard — Complimentary (5–8 business days)</option>
+       <option value="29|Express (2–3 business days)">Express — $29 (2–3 business days)</option>
+       <option value="79|White-glove + assembly (7–10 days)">White-glove + assembly — $79 (7–10 business days)</option>
+     </select>
+     <h3 class="ph" style="margin-top:26px">Payment</h3>
+     <select id="coPay"><option>Credit / Debit card (Visa, Mastercard)</option><option>PayPal</option><option>Afterpay — 4 interest-free instalments</option><option>Zip Pay</option></select>
+     <div class="secure">🔒 <span><b>Secure payment.</b> Card details are tokenised and never stored on our servers · SSL/TLS · PCI DSS.</span></div>
+     <div class="addon"><input type="checkbox" id="coAddon"><div><b style="color:var(--gold-soft)">Protect your purchase — $4</b><div class="hint">Optional accidental-damage cover. Unticked by default — add it only if you want it.</div></div></div>
+     <div class="consent"><input type="checkbox" id="coConsent"><div><b style="color:var(--gold-soft)">Privacy consent (required)</b><div class="hint">I have read and agree to the <a onclick="go('about')" style="color:var(--gold)">Privacy Policy</a> and consent to Temple &amp; Webster collecting and using my personal information to process this order, in line with the Australian Privacy Principles (Privacy Act 1988).</div></div></div>
+     <button class="btn block" onclick="placeOrder()">Pay &amp; place order</button>
+     <p class="hint" style="text-align:center;margin-top:10px">You will not be charged in this demo.</p>
+   </div></div>
+   <div class="col" style="flex:0 0 320px"><div class="panel">
+     <h3 class="ph">Order summary</h3><div id="coSummary"></div>
+     <div class="totrow"><span>Subtotal</span><span id="coSub">$${sub.toLocaleString()}</span></div>
+     <div class="totrow"><span>Delivery</span><span id="coDel">Complimentary</span></div>
+     <div class="totrow"><span>Protection</span><span id="coProt">$0</span></div>
+     <div class="totrow grand"><span>Total</span><span id="coTotal">$${sub.toLocaleString()}</span></div>
+   </div></div></div>`;
+  document.getElementById('coSummary').innerHTML=cart.map(i=>`<div class="totrow"><span>${i.name} ×${i.qty}</span><span>$${(i.price*i.qty).toLocaleString()}</span></div>`).join('');
+  const recalc=()=>{let d=parseInt(document.getElementById('coDelivery').value.split('|')[0]);let a=document.getElementById('coAddon').checked?4:0;
+    document.getElementById('coDel').textContent=d===0?'Complimentary':'$'+d;document.getElementById('coProt').textContent='$'+a;
+    document.getElementById('coTotal').textContent='$'+(sub+d+a).toLocaleString();};
+  document.getElementById('coDelivery').onchange=recalc;document.getElementById('coAddon').onchange=recalc;
+ },
+ account(){
+  if(session){const mine=db.orders.filter(o=>o.email===session.email);
+   app().innerHTML=`<div class="lead"><h2 class="serif">My account</h2></div><div class="panel">
+     <p>Signed in as <b style="color:var(--gold-soft)">${session.name}</b> · ${session.email}</p>
+     <h3 class="ph" style="margin-top:20px">Order history</h3>
+     ${mine.length?`<table class="data"><tr><th>Order</th><th>Total</th><th>Status</th><th>Delivery</th></tr>
+       ${mine.map(o=>`<tr><td>#${o.id}</td><td>$${o.total.toLocaleString()}</td><td>${o.status}</td><td>${o.delivery}</td></tr>`).join('')}</table>`:'<p class="hint">No orders yet.</p>'}
+     <button class="btn line" style="margin-top:20px" onclick="logout()">Sign out</button></div>`;return;}
+  app().innerHTML=`<div class="row">
+    <div class="col"><div class="panel"><h3 class="ph">Sign in</h3>
+      <label>Email</label><input type="email" id="liEmail" placeholder="you@example.com">
+      <label>Password</label><input type="password" id="liPass" placeholder="••••••••">
+      <div class="secure">🔒 <span>Protected by multi-factor authentication.</span></div>
+      <button class="btn block" onclick="login()">Sign in</button>
+      <p class="hint" style="margin-top:12px">New here? Register on the right — a 2FA step will appear.</p></div></div>
+    <div class="col"><div class="panel"><h3 class="ph">Create account</h3>
+      <label>Full name</label><input type="text" id="regName" placeholder="Jane Smith">
+      <label>Email</label><input type="email" id="regEmail" placeholder="you@example.com">
+      <label>Password</label><input type="password" id="regPass" placeholder="Choose a password">
+      <div class="consent"><input type="checkbox" id="regConsent"><div><b style="color:var(--gold-soft)">Privacy consent (required)</b><div class="hint">I agree to the Privacy Policy (Privacy Act 1988).</div></div></div>
+      <button class="btn block" onclick="register()">Create account</button>
+      <p class="hint" style="margin-top:12px">Prefer not to sign up? <a onclick="go('home')" style="color:var(--gold)">Shop as guest</a> — check out &amp; track orders without an account.</p></div></div>
+  </div>`;
+ },
+ about(){
+  app().innerHTML=`<div class="lead"><h2 class="serif">Our story &amp; commitments</h2></div><div class="panel" style="max-width:760px">
+    <p style="color:var(--sand);opacity:.9">Temple &amp; Webster is an ASX-listed Australian online retailer of furniture and homewares, founded in 2011. We operate a hybrid model: a drop-ship supplier network offering an exceptional range, complemented by private-label pieces we design, brand and hold ourselves.</p>
+    <h3 class="ph" style="margin-top:24px">Privacy Policy (summary)</h3>
+    <p class="hint" style="font-size:13px;line-height:1.7">We collect only the personal information needed to fulfil your order — name, delivery address, contact details and a payment token. We obtain your <b style="color:var(--gold-soft)">active consent</b> at checkout before collecting this data, in line with the Australian Privacy Principles (Privacy Act 1988). We never sell your data, and you may request access or deletion at any time.</p>
+    <h3 class="ph" style="margin-top:24px">Security</h3>
+    <p class="hint" style="font-size:13px;line-height:1.7">Every page uses SSL/TLS encryption. Card data is tokenised and never stored on our servers (PCI DSS compliant). Accounts are protected by multi-factor authentication.</p>
+    <h3 class="ph" style="margin-top:24px">Your consumer rights</h3>
+    <p class="hint" style="font-size:13px;line-height:1.7">Under the Australian Consumer Law you're entitled to repair, replacement or refund for faulty goods. We offer free returns within 30 days, and all optional add-ons are opt-in — we never pre-select charges.</p>
+    <h3 class="ph" style="margin-top:24px">Contact &amp; after-sales support</h3>
+    <p class="hint" style="font-size:13px;line-height:1.7">support@templeandwebster.demo · 1300 000 000 · Live chat 9am–6pm AEST. A dedicated after-sales team supports delivery, assembly and returns.</p>
+  </div>`;
+ },
+ confirm(o){
+  app().innerHTML=`<div class="panel" style="text-align:center;max-width:620px;margin:40px auto;padding:56px">
+    <div style="font-size:56px">✓</div>
+    <h2 class="serif" style="font-size:34px;margin:10px 0">Thank you — order #${o.id} confirmed</h2>
+    <p class="hint">A confirmation has been sent to <b style="color:var(--gold-soft)">${o.email}</b>.</p>
+    <p class="pill" style="margin:14px 0">${o.delivery}</p>
+    <div class="totrow grand" style="justify-content:center;gap:12px;border:none"><span>Total paid</span><span>$${o.total.toLocaleString()}</span></div>
+    <p class="hint">Track your order any time — no account required, just your order number and email.</p>
+    <div class="secure" style="justify-content:center">🛟 <span>Need help? Our after-sales team: support@templeandwebster.demo · 1300 000 000</span></div>
+    <button class="btn" style="margin-top:8px" onclick="go('home')">Continue shopping</button></div>`;
+ },
+ admin(){
+  const m=db.metrics;const conv=m.visits?((m.ordersPlaced/m.visits)*100).toFixed(1):0;
+  const abandon=m.checkoutStart?(((m.checkoutStart-m.ordersPlaced)/m.checkoutStart)*100).toFixed(0):0;
+  const rev=db.orders.reduce((s,o)=>s+o.total,0);
+  app().innerHTML=`<div class="lead"><div><h2 class="serif">Analytics &amp; database</h2><p>Back-end view for the Part C Web Analytics justification</p></div></div>
+   <div class="kpi">
+     <div class="box"><div class="n">${m.visits}</div><div class="l">Site visits</div></div>
+     <div class="box"><div class="n">${m.ordersPlaced}</div><div class="l">Orders placed</div></div>
+     <div class="box"><div class="n">$${rev.toLocaleString()}</div><div class="l">Revenue (demo)</div></div>
+     <div class="box"><div class="n">${conv}%</div><div class="l">Conversion rate</div></div>
+   </div>
+   <div class="panel"><h3 class="ph">Conversion funnel</h3>
+     ${fbar('Add to cart',m.addToCart,m.visits)}${fbar('Reached checkout',m.checkoutStart,m.visits)}
+     ${fbar('Consent given',m.consentGiven,m.visits)}${fbar('Orders placed',m.ordersPlaced,m.visits)}
+     <p class="hint" style="margin-top:12px">Cart-abandonment: <b style="color:var(--gold-soft)">${abandon}%</b> · Consent-capture: <b style="color:var(--gold-soft)">${m.checkoutStart?Math.round(m.consentGiven/m.checkoutStart*100):0}%</b> of checkouts.</p></div>
+   <div class="panel"><h3 class="ph">Database · Products (${db.products.length})</h3>
+     <table class="data"><tr><th>ID</th><th>Name</th><th>Category</th><th>Price</th><th>Delivery ETA</th></tr>
+     ${db.products.map(p=>`<tr><td>${p.id}</td><td>${p.name}</td><td>${p.cat}</td><td>$${p.price}</td><td>${p.eta}</td></tr>`).join('')}</table></div>
+   <div class="panel"><h3 class="ph">Database · Customers (${db.customers.length})</h3>
+     ${db.customers.length?`<table class="data"><tr><th>ID</th><th>Name</th><th>Email</th><th>Password (hashed)</th></tr>
+     ${db.customers.map(c=>`<tr><td>${c.id}</td><td>${c.name}</td><td>${c.email}</td><td>${c.hash}</td></tr>`).join('')}</table>`:'<p class="hint">No customers yet — register one on the Account page.</p>'}</div>
+   <div class="panel"><h3 class="ph">Database · Orders (${db.orders.length})</h3>
+     ${db.orders.length?`<table class="data"><tr><th>Order</th><th>Email</th><th>Items</th><th>Total</th><th>Delivery</th><th>Status</th></tr>
+     ${db.orders.map(o=>`<tr><td>#${o.id}</td><td>${o.email}</td><td>${o.items}</td><td>$${o.total.toLocaleString()}</td><td>${o.delivery}</td><td>${o.status}</td></tr>`).join('')}</table>`:'<p class="hint">No orders yet — place one via checkout.</p>'}</div>
+   <button class="btn line" onclick="resetDemo()">Reset demo data</button>`;
+ }
+};
+function fbar(l,v,b){let p=b?Math.round(v/b*100):0;return `<div class="totrow"><span>${l}</span><span>${v}</span></div><div class="bar"><i style="width:${p}%"></i></div>`;}
+
+/* ================= GRID / SEARCH ================= */
+function renderGrid(){const g=document.getElementById('grid');if(!g)return;
+  let items=db.products.filter(p=>(curFilter==='all'||p.cat===curFilter)&&(curSearch===''||p.name.toLowerCase().includes(curSearch)));
+  if(!items.length){g.innerHTML='<p class="hint">No pieces match your search.</p>';return;}
+  g.innerHTML=items.map(p=>`<div class="card">
+    <div class="art" onclick="go('product',${p.id})">${p.tag?`<span class="tag">${p.tag}</span>`:''}${p.icon}</div>
+    <div class="info"><div class="nm" onclick="go('product',${p.id})">${p.name}</div>
+      <div class="rt">${p.rate}</div><div class="pr">$${p.price.toLocaleString()}</div>
+      <div class="et">🚚 ${p.eta}</div><button class="btn block" onclick="addToCart(${p.id})">Add to cart</button></div>
+  </div>`).join('');
+}
+function filterCat(c){curFilter=c;go('home');}
+function search(v){curSearch=v.toLowerCase().trim();if(document.getElementById('grid'))renderGrid();}
+
+/* ================= CART ================= */
+function addToCart(id){const p=db.products.find(x=>x.id===id);const l=cart.find(i=>i.id===id);
+  if(l)l.qty++;else cart.push({id:p.id,name:p.name,price:p.price,qty:1});
+  db.metrics.addToCart++;saveDB(db);persistCart();toast(p.name+' added');}
+function renderCartLines(){const el=document.getElementById('cartLines');if(!el)return;
+  el.innerHTML=cart.map(i=>`<div class="cartline"><div><div class="nm">${i.name}</div><div class="hint">$${i.price.toLocaleString()} each</div></div>
+    <div class="q"><button class="qbtn" onclick="chgQty(${i.id},-1)">−</button>${i.qty}<button class="qbtn" onclick="chgQty(${i.id},1)">+</button>
+    <a onclick="removeItem(${i.id})" style="margin-left:12px;color:var(--warn)">Remove</a></div></div>`).join('');}
+function chgQty(id,d){const l=cart.find(i=>i.id===id);l.qty+=d;if(l.qty<=0)cart=cart.filter(i=>i.id!==id);persistCart();go('cart');}
+function removeItem(id){cart=cart.filter(i=>i.id!==id);persistCart();go('cart');}
+
+/* ================= AUTH + MFA ================= */
+function hash(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h+s.charCodeAt(i))|0;}return 'h'+Math.abs(h).toString(16);}
+function register(){const name=val('regName'),email=val('regEmail'),pass=val('regPass'),c=document.getElementById('regConsent').checked;
+  if(!name||!email||!pass){toast('Please fill all fields');return;}
+  if(!c){toast('Privacy consent is required');return;}
+  if(db.customers.find(x=>x.email===email)){toast('Account exists — please sign in');return;}
+  db.customers.push({id:db.customers.length+1,name,email,hash:hash(pass)});saveDB(db);toast('Account created — now sign in');go('account');}
+function login(){const email=val('liEmail'),pass=val('liPass');const c=db.customers.find(x=>x.email===email);
+  if(!c||c.hash!==hash(pass)){toast('Invalid email or password');return;}
+  pendingLogin=c;document.getElementById('mfaModal').classList.add('show');}
+function verifyMfa(){if(val('mfaCode')!=='482913'){toast('Incorrect code (demo: 482913)');return;}
+  session={name:pendingLogin.name,email:pendingLogin.email};localStorage.setItem('tw_prem_session',JSON.stringify(session));
+  closeMfa();toast('Signed in securely');go('account');}
+function closeMfa(){document.getElementById('mfaModal').classList.remove('show');document.getElementById('mfaCode').value='';}
+function logout(){session=null;localStorage.removeItem('tw_prem_session');toast('Signed out');go('home');}
+
+/* ================= ORDER ================= */
+function placeOrder(){const consent=document.getElementById('coConsent').checked;
+  if(!consent){toast('⚠ Privacy consent is required before payment');return;}
+  db.metrics.consentGiven++;
+  let name=session?session.name:val('coName'),email=session?session.email:val('coEmail');
+  if(!name||!email){toast('Please enter your name and email');saveDB(db);return;}
+  if(!val('coAddr')){toast('Please enter a delivery address');saveDB(db);return;}
+  let sub=cart.reduce((s,i)=>s+i.price*i.qty,0);let dsel=document.getElementById('coDelivery').value.split('|');
+  let del=parseInt(dsel[0]);let addon=document.getElementById('coAddon').checked?4:0;let total=sub+del+addon;
+  const o={id:1000+db.orders.length+1,email,name,items:cart.reduce((s,i)=>s+i.qty,0)+' item(s)',total,delivery:dsel[1],status:'Confirmed'};
+  db.orders.push(o);db.metrics.ordersPlaced++;saveDB(db);cart=[];persistCart();go('confirm',o);}
+function resetDemo(){localStorage.removeItem(DB_KEY);localStorage.removeItem('tw_prem_cart');localStorage.removeItem('tw_prem_session');location.reload();}
+
+/* ================= INIT ================= */
+updateCount();go('home');
+</script>
+</body>
+</html>
