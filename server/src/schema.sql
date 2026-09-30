@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS products (
   category      TEXT    NOT NULL CHECK (category IN ('Living','Bedroom','Outdoor','Décor','Office')),
   price_cents   INTEGER NOT NULL CHECK (price_cents > 0),
   icon          TEXT    NOT NULL,
-  eta           TEXT    NOT NULL,            -- delivery estimate shown on every product
+  eta_min       INTEGER NOT NULL,            -- standard delivery estimate in business days (metro)
+  eta_max       INTEGER NOT NULL,
+  stock         INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),  -- real count, never a vague "in stock"
   rating        REAL    NOT NULL,
   review_count  INTEGER NOT NULL,
   tag           TEXT,
@@ -41,6 +43,11 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_name      TEXT    NOT NULL,
   email              TEXT    NOT NULL,
   address            TEXT    NOT NULL,
+  postcode           TEXT    NOT NULL,
+  delivery_zone      TEXT    NOT NULL CHECK (delivery_zone IN ('metro','regional','remote')),
+  est_from           TEXT    NOT NULL,       -- promised delivery window (YYYY-MM-DD)
+  est_to             TEXT    NOT NULL,
+  deliver_together   INTEGER NOT NULL DEFAULT 0 CHECK (deliver_together IN (0,1)),
   delivery_option    TEXT    NOT NULL,
   delivery_label     TEXT    NOT NULL,
   delivery_cents     INTEGER NOT NULL,
@@ -65,6 +72,26 @@ CREATE TABLE IF NOT EXISTS order_items (
   quantity         INTEGER NOT NULL CHECK (quantity BETWEEN 1 AND 20)
 );
 
+-- Every status change, so customers see a full timeline instead of chasing the courier.
+CREATE TABLE IF NOT EXISTS order_status_history (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id   INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  status     TEXT    NOT NULL CHECK (status IN ('Confirmed','Dispatched','In transit','Out for delivery','Delivered')),
+  note       TEXT    NOT NULL,
+  created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Self-service returns and problem reports.
+CREATE TABLE IF NOT EXISTS return_requests (
+  id         INTEGER PRIMARY KEY AUTOINCREMENT,
+  order_id   INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  reason     TEXT    NOT NULL CHECK (reason IN ('damaged','faulty','missing_parts','wrong_item','change_of_mind')),
+  details    TEXT,
+  resolution TEXT    NOT NULL,
+  status     TEXT    NOT NULL DEFAULT 'Requested',
+  created_at TEXT    NOT NULL DEFAULT (datetime('now'))
+);
+
 -- Web-analytics events that power the admin funnel.
 CREATE TABLE IF NOT EXISTS events (
   id         INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -75,3 +102,5 @@ CREATE TABLE IF NOT EXISTS events (
 CREATE INDEX IF NOT EXISTS idx_orders_user  ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_items_order  ON order_items(order_id);
 CREATE INDEX IF NOT EXISTS idx_events_type  ON events(type);
+CREATE INDEX IF NOT EXISTS idx_history_order ON order_status_history(order_id);
+CREATE INDEX IF NOT EXISTS idx_returns_order ON return_requests(order_id);

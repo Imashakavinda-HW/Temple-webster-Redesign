@@ -23,11 +23,27 @@ export function email(value) {
   return v;
 }
 
-export function password(value) {
+// The most common leaked passwords that still pass an 8-character rule. Following
+// NIST SP 800-63B, we block known-bad passwords instead of forcing odd symbol rules.
+const COMMON_PASSWORDS = new Set([
+  'password', 'password1', 'password123', '12345678', '123456789', '1234567890', '11111111', '00000000',
+  'qwerty123', 'qwertyuiop', 'iloveyou', 'abc12345', 'letmein1', 'welcome1', 'sunshine', 'football',
+  'baseball', 'princess', 'passw0rd', 'trustno1', 'superman', 'whatever', 'dragon12', 'monkey123',
+  'templewebster', 'temple&webster', 'furniture',
+]);
+
+export function password(value, emailAddress = '') {
   if (typeof value !== 'string' || value.length < 8) {
     throw new ValidationError('Password must be at least 8 characters.');
   }
   if (value.length > 72) throw new ValidationError('Password is too long.'); // bcrypt's input limit
+  if (COMMON_PASSWORDS.has(value.toLowerCase())) {
+    throw new ValidationError('That password is too common and appears in leaked-password lists. Please choose another.');
+  }
+  const emailName = emailAddress.split('@')[0].toLowerCase();
+  if (emailName.length >= 4 && value.toLowerCase().includes(emailName)) {
+    throw new ValidationError('Your password shouldn’t contain your email name.');
+  }
   return value;
 }
 

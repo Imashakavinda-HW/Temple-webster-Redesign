@@ -35,7 +35,7 @@ const DUMMY_HASH = bcrypt.hashSync('timing-equaliser', 12);
 router.post('/register', authLimiter, (req, res) => {
   const name = v.text(req.body.name, 'Full name', { max: 80 });
   const email = v.email(req.body.email);
-  const password = v.password(req.body.password);
+  const password = v.password(req.body.password, email);
   if (req.body.consent !== true) throw new v.ValidationError('Privacy consent is required.');
 
   if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) {
