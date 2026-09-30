@@ -6,7 +6,7 @@ export default function ConsentCheckbox({ id, checked, onChange, children }) {
   return (
     <div className="consent">
       <input type="checkbox" id={id} checked={checked} onChange={(e) => onChange(e.target.checked)} />
-      <label htmlFor={id} style={{ all: 'unset', display: 'block', cursor: 'pointer' }}>
+      <label htmlFor={id} className="plain">
         <b style={{ color: 'var(--gold-soft)' }}>Privacy consent (required)</b>
         <div className="hint">
           {children || <>I agree to the <Link to="/about" style={{ color: 'var(--gold)' }}>Privacy Policy</Link> (Privacy Act 1988).</>}

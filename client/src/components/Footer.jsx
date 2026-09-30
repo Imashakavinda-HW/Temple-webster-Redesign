@@ -11,15 +11,16 @@ export default function Footer() {
               Australia's destination for beautiful, considered furniture — delivered securely, with care.
             </p>
           </div>
-          <div><h4>Company</h4>
+          <div><h2>Company</h2>
             <Link to="/about">Our story</Link><Link to="/about">Privacy Policy</Link><Link to="/about">Terms &amp; Conditions</Link>
           </div>
-          <div><h4>Support</h4>
+          <div><h2>Support</h2>
             <Link to="/about">Contact us</Link><Link to="/track">Track an order</Link>
             <Link to="/about">Returns &amp; refunds</Link><Link to="/about">Delivery info</Link>
           </div>
-          <div><h4>Secure Shopping</h4>
-            <a>🔒 SSL / TLS encrypted</a><a>💳 PCI DSS compliant</a><a>🛡️ Privacy Act 1988</a>
+          <div><h2>Secure Shopping</h2>
+            <span className="fnote">🔒 SSL / TLS encrypted</span><span className="fnote">💳 PCI DSS compliant</span>
+            <span className="fnote">🛡️ Privacy Act 1988</span><span className="fnote">🔑 2-step sign-in on every account</span>
           </div>
         </div>
         <div className="bot">

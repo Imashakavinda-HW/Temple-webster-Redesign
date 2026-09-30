@@ -22,10 +22,10 @@ export default function Home() {
       </div></section>
 
       <div className="values">
-        <div><div className="ic">🔒</div><h4>Secure by design</h4><p>SSL/TLS · PCI DSS · Privacy Act 1988</p></div>
-        <div><div className="ic">🚚</div><h4>Delivery you can see</h4><p>Estimated dates on every product</p></div>
-        <div><div className="ic">↩️</div><h4>30-day returns</h4><p>Under Australian Consumer Law</p></div>
-        <div><div className="ic">💬</div><h4>After-sales care</h4><p>Dedicated support team</p></div>
+        <div><div className="ic">🔒</div><h2>Secure by design</h2><p>SSL/TLS · PCI DSS · Privacy Act 1988</p></div>
+        <div><div className="ic">🚚</div><h2>Delivery you can see</h2><p>Estimated dates on every product</p></div>
+        <div><div className="ic">↩️</div><h2>30-day returns</h2><p>Under Australian Consumer Law</p></div>
+        <div><div className="ic">💬</div><h2>After-sales care</h2><p>Dedicated support team</p></div>
       </div>
 
       <div className="lead">

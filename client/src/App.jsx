@@ -11,6 +11,7 @@ import Account from './pages/Account.jsx';
 import About from './pages/About.jsx';
 import Track from './pages/Track.jsx';
 import Admin from './pages/Admin.jsx';
+import Saved from './pages/Saved.jsx';
 import { track } from './lib/api.js';
 
 export default function App() {
@@ -32,7 +33,7 @@ export default function App() {
   return (
     <>
       <Header />
-      <main className="wrap">
+      <main className="wrap" id="main" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/product/:id" element={<Product />} />
@@ -42,8 +43,9 @@ export default function App() {
           <Route path="/account" element={<Account />} />
           <Route path="/about" element={<About />} />
           <Route path="/track" element={<Track />} />
+          <Route path="/saved" element={<Saved />} />
           <Route path="/analytics" element={<Admin />} />
-          <Route path="*" element={<div className="panel center"><h2 className="serif">Page not found</h2><Link className="btn" to="/">Back to the collection</Link></div>} />
+          <Route path="*" element={<div className="panel center"><h1 className="serif">Page not found</h1><Link className="btn" to="/">Back to the collection</Link></div>} />
         </Routes>
       </main>
       <Footer />

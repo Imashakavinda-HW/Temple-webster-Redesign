@@ -26,9 +26,10 @@ export default function MfaModal({ challenge, onSuccess, onCancel }) {
   };
 
   return (
-    <div className="modal show" role="dialog" aria-modal="true" aria-labelledby="mfaTitle">
+    <div className="modal show" role="dialog" aria-modal="true" aria-labelledby="mfaTitle"
+         onKeyDown={(e) => { if (e.key === 'Escape') onCancel(); }}>
       <form className="panel" onSubmit={verify}>
-        <h3 className="ph" id="mfaTitle">Two-Factor Verification</h3>
+        <h2 className="ph" id="mfaTitle">Two-Factor Verification</h2>
         <p className="hint">
           For your security, we've sent a 6-digit code to your email. It expires in 5 minutes.
           {challenge.demoCode && <> <span style={{ color: 'var(--gold)' }}>(Demo code: {challenge.demoCode})</span></>}
