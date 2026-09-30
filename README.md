@@ -12,9 +12,13 @@ A full-stack rebuild of the single-file design prototype (`docs/original-design.
 
 **Improvements over the real templeandwebster.com.au:** a postcode **delivery estimator with real dates and costs before checkout** · **honest stock levels** that can't be oversold · a free **"deliver everything together"** option · an **order-tracking timeline** with automatic customer notifications · **self-service returns / problem reports** under the ACL · a **privacy centre** (download or delete my data) · **leaked-password blocking** · a **wishlist** · **0 accessibility violations** (WCAG 2.1 AA) · **automated tests**.
 
+**Design:** two themes built from one set of colour tokens. **Daylight** (default) uses the Hearth & Hollow colours and line-art pictures (white, teal, pastel tiles). **Evening** is the original dark and gold design, switched with the **Evening** button in the header. The UI was audited with the **UI/UX Pro Max** skill and has **0 accessibility violations** (WCAG 2.2 AA) in both themes.
+
 Documents for your presentation:
 - **[`docs/DECISIONS.md`](docs/DECISIONS.md)**: every design and security decision, step by step.
 - **[`docs/COMPETITOR-ANALYSIS.md`](docs/COMPETITOR-ANALYSIS.md)**: how this compares with the real Temple & Webster site, with sources.
+- **[`docs/DESIGN-AUDIT.md`](docs/DESIGN-AUDIT.md)**: the UI/UX Pro Max skill audit, every rule applied, and the test-loop results.
+- **[`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md)**: colours, measured contrast, fonts, icons and the two themes.
 
 ---
 
@@ -56,6 +60,8 @@ Then open **http://localhost:3001**.
 
 **Run the automated tests:** `npm test` runs 15 API tests (security rules, checkout, stock, delivery, MFA, roles, privacy) against a throw-away database. Your demo data isn't touched.
 
+**Run the browser test + accessibility audit:** `npm run build`, then `npm run test:e2e`. The first time, also run `npx playwright install chromium` to download the test browser. It starts its own copy of the site on port 3107 with a throw-away database, runs 79 checks (shopping, checkout, MFA, admin, returns, privacy, both themes, keyboard, focus and phone sizes) and an axe WCAG 2.2 audit of 22 page views, then cleans up. Set `SCREENSHOTS=shots` to also save screenshots.
+
 **Reset everything:** stop the server, then run `npm run seed`. This wipes the database and re-seeds the products and the admin account. You can also use the **Reset demo data** button on the Analytics page.
 
 ## 4. Demo walkthrough
@@ -66,7 +72,11 @@ Then open **http://localhost:3001**.
 | Honest stock | The wool rug is **Out of stock** (button disabled). Bedside tables show **Only 3 left**, and you can't add a 4th. |
 | Delivery estimator | On any product page, type postcode **3171** (metro), **2650** (regional) or **0870** (remote: $49 surcharge, no express). You'll see real dates. |
 | Combined delivery | Put the sofa and the lamp in the cart. The cart warns they ship separately, and checkout offers "Deliver everything together (free)". |
-| Wishlist | Tap ♡ on any product, then open **Saved**. |
+| Wishlist | Tap the heart on any product, then open **Saved**. |
+| Two themes | Press **Evening** in the header to switch to the dark and gold design. Reload the page and your choice is remembered. |
+| Accessible forms | At checkout, press **Pay** with the form empty. A summary lists every problem and each link jumps to its field. |
+| Undo | In the cart, press **Remove**, then **Undo** in the pop-up message. |
+| Keyboard | Press Tab on any page: the first stop is **Skip to main content**, and every control shows a visible focus ring. |
 | Guest checkout | Add items, then **Cart**, then **Proceed to checkout**. Fill in name, email and address. |
 | Required consent | Click **Pay & place order** without ticking consent. You get a warning and the server also rejects it. |
 | Opt-in add-on | "Protect your purchase" starts **unticked**. Tick it and the $4 appears in the total. |
@@ -100,6 +110,9 @@ Set these as environment variables before starting the server:
 ├── docs/
 │   ├── DECISIONS.md        step-by-step explanation of every decision
 │   ├── COMPETITOR-ANALYSIS.md  comparison with the real templeandwebster.com.au
+│   ├── DESIGN-AUDIT.md     UI/UX Pro Max skill audit and results
+│   ├── DESIGN-SYSTEM.md    tokens, contrast, fonts, icons, themes
+│   └── reference-hearth-and-hollow.html  colour and picture reference
 │   └── original-design.html the original single-file prototype
 ├── server/
 │   └── src/
@@ -121,15 +134,17 @@ Set these as environment variables before starting the server:
 │           ├── events.js       analytics events
 │           └── admin.js        analytics, order status updates, returns queue (admin only)
 │   └── test/api.test.js    automated API tests (npm test)
+├── e2e/                    browser test + accessibility audit (npm run test:e2e)
 └── client/
-    ├── index.html, vite.config.js
+    ├── index.html, vite.config.js, public/theme-init.js (applies the saved theme before first paint)
     └── src/
         ├── main.jsx, App.jsx    providers + routes
         ├── styles.css           the original design's CSS, unchanged
         ├── lib/                 api.js (fetch wrapper), format.js (money)
         ├── context/             ShopContext (catalogue + cart), AuthContext, ToastContext
         ├── components/          Header, Footer, ProductCard, SecureBadge, ConsentCheckbox, MfaModal,
-        │                        DeliveryEstimate, StockBadge
+        │                        DeliveryEstimate, StockBadge, Icons, Illustrations, ThemeToggle,
+        │                        PasswordInput, FormBits (error summary / field errors)
         └── pages/               Home, Product, Cart, Checkout, Confirmation, Account, Track, Saved, About, Admin
 ```
 

@@ -158,7 +158,7 @@ The order and its items are written in one **database transaction**. If anything
 ## Step 5: Front-end (React) (`client/src`)
 
 ### 5.1 Matching the design exactly
-The original `<style>` block was copied **unchanged** into `styles.css`, so every colour, font, spacing and hover effect is identical. That includes the dark and gold palette, Cormorant Garamond headings and Inter body text. A few small additions (card input grid, error box) are clearly marked at the bottom of the file. The HTML was converted to JSX with the same class names.
+The first version copied the original `<style>` block into `styles.css` so every colour, font and spacing matched, and converted the HTML to JSX with the same class names. In Step 10 the stylesheet was rebuilt around colour tokens. The original dark and gold design is still available exactly as the **Evening** theme, and the new **Daylight** theme uses the Hearth & Hollow colours.
 
 ### 5.2 Components (reuse)
 | Component | Used on |
@@ -227,9 +227,9 @@ Testing was run as a loop: build, test, fix whatever failed, then run everything
 | Account deletion with the wrong password | Rejected |
 | Security headers, malformed JSON, 20 KB body | CSP present, 400, 413 |
 
-**2. Browser end-to-end test (37 checks, all passing).** An automated Chromium browser shops the site like a customer: browse, filter, search, estimate delivery, save items, try to exceed stock, check out (including trying without consent), track the order, report damage, sign in as admin with MFA, dispatch the order, register a customer, fail MFA once, download their data and delete the account. It also checks that phones (390 px wide) never get a sideways scrollbar.
+**2. Browser end-to-end test (79 checks after Step 9, all passing).** An automated Chromium browser shops the site like a customer: browse, filter, search, estimate delivery, save items, try to exceed stock, check out (including trying without consent), track the order, report damage, sign in as admin with MFA, dispatch the order, register a customer, fail MFA once, download their data and delete the account. It also checks that phones (390 px wide) never get a sideways scrollbar.
 
-**3. Accessibility audit: 0 violations on all 13 pages.** The browser test runs **axe-core** (the industry-standard checker) against WCAG 2.1 A/AA and best-practice rules on every page. The first run found real problems, and all were fixed:
+**3. Accessibility audit: 0 violations (15 Daylight pages + 7 Evening pages, WCAG 2.2 AA after Step 9).** The browser test runs **axe-core** (the industry-standard checker) against WCAG 2.1 A/AA and best-practice rules on every page. The first run found real problems, and all were fixed:
 - headings skipped levels
 - links in text were identified only by colour (they're now underlined)
 - the announcement bar was outside a landmark
@@ -260,7 +260,32 @@ The full comparison, with sources, is in [`COMPETITOR-ANALYSIS.md`](COMPETITOR-A
 | **Analytics link hidden for non-admins** | The server already blocks them (401/403). Hiding the link simply avoids showing customers a page they can't use. |
 | **Schema versioning** | `PRAGMA user_version` records the schema version, so an older database file is rebuilt automatically after an upgrade. |
 
-## Step 9: Known limitations (be upfront about these in your presentation)
+## Step 9: UI/UX audit with the UI/UX Pro Max skill
+
+The whole interface was audited with the open-source UI/UX Pro Max skill (119 UX rules, in priority order). The full list of findings and fixes is in [`DESIGN-AUDIT.md`](DESIGN-AUDIT.md). The headline changes:
+- **SVG icons instead of emoji**: emoji look different on every device and can't be styled.
+- **Focus management**: focus moves to each new page's heading; the dialog traps focus; the sticky header can't hide the focused field.
+- **Accessible forms**: an error summary that receives focus, plus an error message next to each field; required-field markers; show/hide password; Undo.
+- **Performance**: pages load on demand, and placeholder cards show while products load.
+- **Navigation**: the current page is highlighted; a breadcrumb; the Back button restores your scroll position.
+
+> **Say it like this:** "We audited the UI against a 119-rule UX checklist, fixed every gap, and proved it with an automated loop: 79 browser checks and zero WCAG 2.2 violations in both themes."
+
+---
+
+## Step 10: Daylight and Evening themes
+
+The **Daylight** theme uses the colours and line-art pictures of the Hearth & Hollow reference design. It's white and teal, close to the real Temple & Webster site, and it's the default. The original dark and gold design became the **Evening** theme.
+
+Decisions:
+- **Semantic colour tokens**: components use names like `--accent-text`, and each theme supplies the values. Adding a third theme would mean one new block of tokens, not touching every component.
+- **Contrast measured, not assumed**: some reference colours failed WCAG. The clearest example is white text on its teal, at 3.75:1. Darker shades were used for text, and the lighter shades kept for decoration. The table is in [`DESIGN-SYSTEM.md`](DESIGN-SYSTEM.md).
+- **No flash of the wrong theme**: a tiny script in the page head applies the saved choice before anything is drawn. It's a separate file because the Content-Security-Policy blocks inline scripts.
+- **One set of drawings, two colourings**: the product drawings use `currentColor`. They sit on pastel tiles in Daylight and are drawn in gold on dark in Evening.
+
+---
+
+## Step 11: Known limitations (be upfront about these in your presentation)
 
 | Limitation | What production would do |
 |---|---|
@@ -274,3 +299,5 @@ The full comparison, with sources, is in [`COMPETITOR-ANALYSIS.md`](COMPETITOR-A
 | Product images are emoji (as in the original design) | Real photography served from a CDN |
 | Postcode zones are a simplified table; public holidays aren't counted | The carrier's zone file / API and a state holiday calendar |
 | Status updates and notifications are triggered manually by an admin | Courier tracking webhooks update statuses automatically |
+| Product pictures are line drawings | Real product photography, with the drawings kept as loading placeholders |
+| On phones the menu wraps onto two rows | A slide-out menu (drawer) with a focus trap |

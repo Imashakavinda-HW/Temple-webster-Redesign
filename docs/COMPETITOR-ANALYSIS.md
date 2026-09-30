@@ -53,9 +53,9 @@ From review and complaint aggregators ([Trustpilot][tp], [ProductReview][pr], [A
 | **Privacy centre**: download my data (APP 12), delete my account (APP 11.2) | ✅ Self-service, in the account page | *Not verified.* Most retailers require an email request. |
 | **Privacy consent** at checkout | ✅ Explicit, never pre-ticked, enforced by the server, timestamped | *Not verified* |
 | **Optional add-ons never pre-ticked** | ✅ Enforced by the server (only `true` counts) | T&W sells "Purchase Protection"; check how it's presented at checkout |
-| **Accessibility** | ✅ **0 violations** in an automated axe WCAG 2.1 AA audit on all 13 pages; skip link; visible keyboard focus; underlined text links; reduced-motion support; no sideways scrolling on phones | *Not verified.* Run the same audit (checklist below). |
+| **Accessibility** | ✅ **0 violations** in an automated axe WCAG 2.2 AA audit (15 Daylight + 7 Evening pages); skip link; visible keyboard focus; underlined text links; reduced-motion support; no sideways scrolling on phones | *Not verified.* Run the same audit (checklist below). |
 | **Content-Security-Policy** | ✅ Strict (`script-src 'self'`). The test tool's own injected script was blocked by it. | *Not verified.* Check the response headers. |
-| **Automated tests** | ✅ 15 API tests (`npm test`) + 37-step browser test | n/a |
+| **Automated tests** | ✅ 15 API tests (`npm test`) + 79-check browser test | n/a |
 
 ## 4. Where the real site is still better (be upfront about this)
 
