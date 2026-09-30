@@ -50,6 +50,9 @@ export function ShopProvider({ children }) {
   }, [products]);
 
   const removeItem = useCallback((id) => setCartIds((c) => c.filter((l) => l.id !== id)), []);
+  // Puts a removed line back in its original position (for the Undo button).
+  const restoreItem = useCallback((line, index) => setCartIds((c) => (c.some((l) => l.id === line.id)
+    ? c : [...c.slice(0, index), line, ...c.slice(index)])), []);
   const clearCart = useCallback(() => setCartIds([]), []);
   const toggleSaved = useCallback((id) =>
     setSavedIds((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id])), []);
@@ -63,7 +66,7 @@ export function ShopProvider({ children }) {
     products, loading, refreshProducts, cart,
     cartCount: cart.reduce((s, l) => s + l.qty, 0),
     subtotalCents: cart.reduce((s, l) => s + l.product.priceCents * l.qty, 0),
-    addToCart, changeQty, removeItem, clearCart,
+    addToCart, changeQty, removeItem, restoreItem, clearCart,
     savedIds, toggleSaved, postcode, setPostcode,
   };
   return <ShopContext.Provider value={value}>{children}</ShopContext.Provider>;

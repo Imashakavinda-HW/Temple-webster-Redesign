@@ -4,34 +4,44 @@ import { useToast } from '../context/ToastContext.jsx';
 import SecureBadge from '../components/SecureBadge.jsx';
 import StockBadge from '../components/StockBadge.jsx';
 import DeliveryEstimate from '../components/DeliveryEstimate.jsx';
-import { SaveButton } from '../components/ProductCard.jsx';
-import { money, stars } from '../lib/format.js';
+import { Rating, SaveButton } from '../components/ProductCard.jsx';
+import { Icon, ProductArt } from '../components/Icons.jsx';
+import { tileStyle } from '../components/Illustrations.jsx';
+import { useDocumentTitle } from '../lib/useDocumentTitle.js';
+import { CaretRight } from '@phosphor-icons/react';
+import { money } from '../lib/format.js';
 
 export default function Product() {
   const { id } = useParams();
   const { products, loading, addToCart } = useShop();
   const toast = useToast();
   const p = products.find((x) => x.id === Number(id));
+  useDocumentTitle(p?.name);
 
   if (loading) return <p className="hint" style={{ margin: '24px 0' }}>Loading…</p>;
   if (!p) return <div className="panel center"><h1 className="serif">Product not found</h1><Link className="btn" to="/">Back to collection</Link></div>;
 
   return (
     <>
-      <p className="hint" style={{ margin: '24px 0' }}><Link to="/" style={{ color: 'var(--gold)' }}>← Back to collection</Link></p>
+      <nav aria-label="Breadcrumb" className="crumbs">
+        <ol>
+          <li><Link to="/">Collection</Link><Icon as={CaretRight} size={12} /></li>
+          <li><Link to={`/?cat=${encodeURIComponent(p.category)}`}>{p.category}</Link><Icon as={CaretRight} size={12} /></li>
+          <li aria-current="page">{p.name}</li>
+        </ol>
+      </nav>
       <div className="row">
         <div className="col" style={{ flex: '0 0 46%' }}>
-          <div className="art" role="img" aria-label={p.name} style={{ aspectRatio: 1, fontSize: 130, background: 'linear-gradient(160deg,#241f1a,#15110e)',
-            border: '1px solid var(--line)', borderRadius: 'var(--r)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {p.icon}
+          <div className="art big" role="img" aria-label={`Illustration of the ${p.name}`} style={tileStyle(p.id)}>
+            <ProductArt name={p.icon} />
           </div>
         </div>
         <div className="col">
           {p.tag && <span className="pill">{p.tag}</span>}
           <h1 className="serif" style={{ fontSize: 40, fontWeight: 600, margin: '14px 0 6px', lineHeight: 1.15 }}>{p.name}</h1>
-          <div className="hint" style={{ fontSize: 13 }}>{stars(p)}</div>
-          <div style={{ fontFamily: 'var(--serif)', fontSize: 34, color: 'var(--gold)', fontWeight: 700, margin: '16px 0' }}>{money(p.priceCents)}</div>
-          <p style={{ color: 'var(--sand)', opacity: 0.85 }}>{p.description}</p>
+          <Rating product={p} className="hint" />
+          <div style={{ fontFamily: 'var(--serif)', fontSize: 34, color: 'var(--accent-text)', fontWeight: 700, margin: '16px 0' }}>{money(p.priceCents)}</div>
+          <p style={{ color: 'var(--text-2)', opacity: 0.85 }}>{p.description}</p>
           <StockBadge stock={p.stock} />
           <DeliveryEstimate items={[{ id: p.id, qty: 1 }]} />
           <SecureBadge>Secure payment · <b>PCI DSS compliant</b> · your data is protected under the Privacy Act 1988.</SecureBadge>
@@ -42,7 +52,7 @@ export default function Product() {
             <SaveButton product={p} className="btn ghost savebig" />
           </div>
           <p className="hint" style={{ marginTop: 20, lineHeight: 1.7 }}>
-            <b style={{ color: 'var(--gold-soft)' }}>Legal &amp; ethical:</b> Free returns within 30 days under Australian Consumer Law, refunded to
+            <b style={{ color: 'var(--emphasis)' }}>Legal &amp; ethical:</b> Free returns within 30 days under Australian Consumer Law, refunded to
             your original payment method, not store credit. Arrived damaged? We collect it for free. Supplied via our vetted supplier
             network and quality-checked before dispatch. No hidden fees: optional extras are always opt-in.
           </p>

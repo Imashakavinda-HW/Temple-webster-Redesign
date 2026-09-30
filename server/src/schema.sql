@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS products (
   name          TEXT    NOT NULL,
   category      TEXT    NOT NULL CHECK (category IN ('Living','Bedroom','Outdoor','Décor','Office')),
   price_cents   INTEGER NOT NULL CHECK (price_cents > 0),
-  icon          TEXT    NOT NULL,
+  icon          TEXT    NOT NULL,            -- Phosphor icon name, e.g. 'Couch'
   eta_min       INTEGER NOT NULL,            -- standard delivery estimate in business days (metro)
   eta_max       INTEGER NOT NULL,
   stock         INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),  -- real count, never a vague "in stock"

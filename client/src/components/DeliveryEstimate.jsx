@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { api } from '../lib/api.js';
 import { useShop } from '../context/ShopContext.jsx';
+import { Truck } from '@phosphor-icons/react';
 import { fmtRange, money } from '../lib/format.js';
+import { Icon } from './Icons.jsx';
 
 // Postcode-based delivery estimate: fee + real calendar dates, shown BEFORE checkout.
 // `items` is [{ id, qty }]. The postcode is remembered across pages.
@@ -24,13 +26,14 @@ export function useDeliveryEstimate(items, option = 'standard') {
   return { estimate, error };
 }
 
-export function PostcodeInput({ id = 'postcode', label = 'Delivery postcode' }) {
+export function PostcodeInput({ id = 'postcode', label = 'Delivery postcode', required, invalid, describedBy }) {
   const { postcode, setPostcode } = useShop();
   return (
     <>
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}>{label}{required && <span className="req" aria-hidden="true">*</span>}</label>
       <input type="text" id={id} inputMode="numeric" autoComplete="postal-code" maxLength={4} placeholder="e.g. 3171"
-             value={postcode} onChange={(e) => setPostcode(e.target.value.replace(/\D/g, ''))} />
+             value={postcode} onChange={(e) => setPostcode(e.target.value.replace(/\D/g, ''))}
+             aria-required={required || undefined} aria-invalid={invalid || undefined} aria-describedby={describedBy} />
     </>
   );
 }
@@ -42,10 +45,10 @@ export default function DeliveryEstimate({ items, compact = false }) {
   return (
     <div className="estimator">
       <PostcodeInput id={compact ? 'pcCart' : 'pcProduct'} label="Check delivery to your postcode" />
-      {error && <div className="hint" style={{ color: 'var(--warn)' }} role="alert">{error}</div>}
+      {error && <div className="hint" style={{ color: 'var(--danger)' }} role="alert">{error}</div>}
       {std && (
         <div className="est-result" aria-live="polite">
-          <div>🚚 <b>Arrives {fmtRange(std.from, std.to)}</b> to {estimate.postcode} {estimate.state} ({estimate.zoneLabel})</div>
+          <div><Icon as={Truck} /> <b>Arrives {fmtRange(std.from, std.to)}</b> to {estimate.postcode} {estimate.state} ({estimate.zoneLabel})</div>
           <div className="hint">
             Standard delivery {std.cents ? money(std.cents) + ' (remote-area surcharge)' : 'free'}
             {estimate.options.express.available

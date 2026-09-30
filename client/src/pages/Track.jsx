@@ -3,6 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { api } from '../lib/api.js';
 import { fmtRange, money } from '../lib/format.js';
 import { useToast } from '../context/ToastContext.jsx';
+import { Icon } from '../components/Icons.jsx';
+import { FieldError, Req } from '../components/FormBits.jsx';
+import { Lifebuoy } from '@phosphor-icons/react';
+import { useDocumentTitle } from '../lib/useDocumentTitle.js';
 
 const REASONS = {
   damaged: 'Arrived damaged',
@@ -38,29 +42,33 @@ function ReturnForm({ order, email, onDone }) {
   const [reason, setReason] = useState('');
   const [details, setDetails] = useState('');
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
 
   const submit = async (e) => {
     e.preventDefault();
-    if (!reason) { toast('Please choose a reason'); return; }
+    if (!reason) { setError('Choose what happened so we can offer the right remedy'); document.getElementById('rtReason').focus(); return; }
     setBusy(true);
+    setError('');
     try {
       await api(`/api/orders/${order.id}/returns`, { method: 'POST', body: { email, reason, details } });
       toast('Request received — we’ll email you shortly');
       onDone();
-    } catch (err) { toast(err.message); } finally { setBusy(false); }
+    } catch (err) { setError(err.message); } finally { setBusy(false); }
   };
 
   return (
-    <form onSubmit={submit} style={{ marginTop: 10 }}>
-      <label htmlFor="rtReason">What happened?</label>
-      <select id="rtReason" value={reason} onChange={(e) => setReason(e.target.value)}>
+    <form onSubmit={submit} style={{ marginTop: 10 }} noValidate>
+      <label htmlFor="rtReason">What happened?<Req /></label>
+      <select id="rtReason" value={reason} onChange={(e) => setReason(e.target.value)} aria-required="true"
+              {...(error ? { 'aria-invalid': true, 'aria-describedby': 'rtReason-error' } : {})}>
         <option value="">Choose a reason…</option>
         {Object.entries(REASONS).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
       </select>
+      <FieldError id="rtReason-error" message={error} />
       <label htmlFor="rtDetails">Details (optional)</label>
       <textarea id="rtDetails" rows={3} maxLength={500} value={details} onChange={(e) => setDetails(e.target.value)}
                 placeholder="e.g. The left leg of the table was cracked on arrival." />
-      <button className="btn ghost block" style={{ marginTop: 14 }} disabled={busy}>Submit request</button>
+      <button className="btn ghost block" style={{ marginTop: 14 }} disabled={busy}>{busy ? 'Sending…' : 'Submit request'}</button>
     </form>
   );
 }
@@ -68,6 +76,7 @@ function ReturnForm({ order, email, onDone }) {
 // Order tracking with a full status timeline, for guests and customers alike.
 export default function Track() {
   const [params] = useSearchParams();
+  useDocumentTitle('Track your order');
   const [orderId, setOrderId] = useState(params.get('orderId') || '');
   const [email, setEmail] = useState(params.get('email') || '');
   const [order, setOrder] = useState(null);
@@ -113,7 +122,7 @@ export default function Track() {
 
             <h3 className="ph" style={{ marginTop: 24, fontSize: 20 }}>Problem with your order?</h3>
             {order.returns.map((r, i) => (
-              <div className="secure" key={i}>🛟 <span><b>{REASONS[r.reason]}</b> ({r.status}): {r.resolution}</span></div>
+              <div className="secure" key={i}><Icon as={Lifebuoy} size={20} /> <span><b>{REASONS[r.reason]}</b> ({r.status}): {r.resolution}</span></div>
             ))}
             {!openReturn && (showReturn
               ? <ReturnForm order={order} email={email} onDone={() => { setShowReturn(false); lookup(order.id, email); }} />

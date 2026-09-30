@@ -18,7 +18,7 @@ db.pragma('foreign_keys = ON');   // SQLite leaves FK enforcement off unless ask
 
 // Schema versioning: PRAGMA user_version records which schema version the file was built
 // with. The prototype holds demo data only, so an out-of-date file is simply rebuilt.
-const SCHEMA_VERSION = 2;
+const SCHEMA_VERSION = 3; // v3: product icons are SVG icon names instead of emoji
 if (db.pragma('user_version', { simple: true }) < SCHEMA_VERSION) {
   const old = db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'").all();
   if (old.length) {

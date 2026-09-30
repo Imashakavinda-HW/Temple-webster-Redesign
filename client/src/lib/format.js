@@ -2,8 +2,6 @@
 export const money = (cents) =>
   '$' + (cents / 100).toLocaleString('en-AU', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
-export const stars = (p) => `★ ${p.rating} · ${p.reviewCount} reviews`;
-
 // "2026-10-07" → "Wed 7 Oct". Parsed as a local date so it never shifts a day by timezone.
 export function fmtDate(isoDate) {
   const [y, m, d] = isoDate.split('-').map(Number);

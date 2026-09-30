@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import { CreditCard, Key, LockSimple, ShieldCheck } from '@phosphor-icons/react';
+import { Icon } from './Icons.jsx';
 
 export default function Footer() {
   return (
@@ -7,7 +9,7 @@ export default function Footer() {
         <div className="cols">
           <div style={{ maxWidth: 260 }}>
             <div className="logo" style={{ fontSize: 22 }}>Temple <em>&amp;</em> Webster</div>
-            <p style={{ color: 'var(--muted)', fontSize: 13, marginTop: 12 }}>
+            <p style={{ fontSize: 13, marginTop: 12 }}>
               Australia's destination for beautiful, considered furniture — delivered securely, with care.
             </p>
           </div>
@@ -19,12 +21,15 @@ export default function Footer() {
             <Link to="/about">Returns &amp; refunds</Link><Link to="/about">Delivery info</Link>
           </div>
           <div><h2>Secure Shopping</h2>
-            <span className="fnote">🔒 SSL / TLS encrypted</span><span className="fnote">💳 PCI DSS compliant</span>
-            <span className="fnote">🛡️ Privacy Act 1988</span><span className="fnote">🔑 2-step sign-in on every account</span>
+            <span className="fnote"><Icon as={LockSimple} /> SSL / TLS encrypted</span><span className="fnote"><Icon as={CreditCard} /> PCI DSS compliant</span>
+            <span className="fnote"><Icon as={ShieldCheck} /> Privacy Act 1988</span><span className="fnote"><Icon as={Key} /> 2-step sign-in on every account</span>
           </div>
         </div>
         <div className="bot">
           <span>© 2026 Temple &amp; Webster (demo). ABN 80 604 106 011.</span>
+          <ul className="paylist" aria-label="Payment methods we accept">
+            <li>Visa</li><li>Mastercard</li><li>PayPal</li><li>Afterpay</li><li>Zip</li>
+          </ul>
           <span>Prototype for BIT363 · secure e-business solution</span>
         </div>
       </div>

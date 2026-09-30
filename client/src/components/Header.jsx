@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useShop } from '../context/ShopContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { ChartBar, Heart, MagnifyingGlass, Package, ShoppingBag, Star, User } from '@phosphor-icons/react';
+import { Icon } from './Icons.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 
 export const CATEGORIES = ['Living', 'Bedroom', 'Outdoor', 'Décor', 'Office'];
 
@@ -32,8 +35,9 @@ export default function Header() {
     <>
       <a className="skip" href="#main">Skip to main content</a>
       <aside className="ann" aria-label="Store announcements">
-        <span>Complimentary delivery over $500</span> · <span><b>4.6★</b> Trustpilot</span> ·{' '}
-        <span>30-day returns under Australian Consumer Law</span> · <span>Talk to a real person: <b>1300 000 000</b></span>
+        <span>Complimentary delivery over $500</span>
+        <span className="ann-extra"> · <span><b>4.6<Icon as={Star} weight="fill" size={11} /></b> Trustpilot</span> ·{' '}
+          <span>30-day returns under Australian Consumer Law</span></span> · <span>Talk to a real person: <b>1300 000 000</b></span>
       </aside>
       <header className="top">
         <div className="wrap">
@@ -42,18 +46,21 @@ export default function Header() {
               Temple <em>&amp;</em> Webster<small>Fine Furniture &amp; Homewares</small>
             </Link>
             <form className="search" role="search" onSubmit={(e) => e.preventDefault()}>
-              <input type="search" placeholder="Search the collection…" value={query}
+              <Icon as={MagnifyingGlass} />
+              <input type="search" placeholder="Search sofas, rugs, lamps…" value={query}
                      onChange={(e) => onSearch(e.target.value)} aria-label="Search the collection" />
             </form>
             <nav className="nav" aria-label="Main">
-              <Link to="/about">Our Story</Link>
-              <Link to="/track">Track Order</Link>
-              <Link to="/saved">Saved{savedIds.length > 0 && ` (${savedIds.length})`}</Link>
-              <Link to="/account">{user ? `Hi, ${user.name.split(' ')[0]}` : 'Account'}</Link>
-              {user?.role === 'admin' && <Link to="/analytics">Analytics</Link>}
-              <Link to="/cart" className="cartbtn" aria-label={`Cart, ${cartCount} item${cartCount === 1 ? '' : 's'}`}>
-                Cart<span className="badge" aria-hidden="true">{cartCount}</span>
-              </Link>
+              {/* NavLink marks the current page with class "active" and aria-current="page".
+                  Every item has an icon AND a visible text label (skill: nav-label-icon). */}
+              <NavLink to="/track"><Icon as={Package} /> Track Order</NavLink>
+              <NavLink to="/saved"><Icon as={Heart} /> Saved{savedIds.length > 0 && ` (${savedIds.length})`}</NavLink>
+              <NavLink to="/account"><Icon as={User} /> {user ? `Hi, ${user.name.split(' ')[0]}` : 'Account'}</NavLink>
+              {user?.role === 'admin' && <NavLink to="/analytics"><Icon as={ChartBar} /> Analytics</NavLink>}
+              <NavLink to="/cart" className="cartbtn" aria-label={`Cart, ${cartCount} item${cartCount === 1 ? '' : 's'}`}>
+                <Icon as={ShoppingBag} /> Cart<span className="badge" aria-hidden="true">{cartCount}</span>
+              </NavLink>
+              <ThemeToggle />
             </nav>
           </div>
           <nav className="cats" aria-label="Categories">
@@ -61,6 +68,7 @@ export default function Header() {
             {CATEGORIES.map((c) => (
               <Link key={c} to={catLink(c)} onClick={() => setQuery('')} aria-current={activeCat === c ? 'page' : undefined}>{c}</Link>
             ))}
+            <Link to="/about">Our Story</Link>
           </nav>
         </div>
       </header>

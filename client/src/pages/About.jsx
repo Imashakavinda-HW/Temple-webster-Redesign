@@ -1,11 +1,14 @@
+import { useDocumentTitle } from '../lib/useDocumentTitle.js';
+
 export default function About() {
+  useDocumentTitle('Our story');
   const p = { fontSize: 13, lineHeight: 1.7 };
-  const b = { color: 'var(--gold-soft)' };
+  const b = { color: 'var(--emphasis)' };
   return (
     <>
       <div className="lead"><h1 className="serif">Our story &amp; commitments</h1></div>
       <div className="panel" style={{ maxWidth: 760 }}>
-        <p style={{ color: 'var(--sand)', opacity: 0.9 }}>
+        <p style={{ color: 'var(--text-2)', opacity: 0.9 }}>
           Temple &amp; Webster is an ASX-listed Australian online retailer of furniture and homewares, founded in 2011. We operate a
           hybrid model: a drop-ship supplier network offering an exceptional range, complemented by private-label pieces we design,
           brand and hold ourselves.

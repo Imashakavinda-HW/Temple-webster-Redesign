@@ -1,8 +1,24 @@
 import { Link } from 'react-router-dom';
 import { useShop } from '../context/ShopContext.jsx';
 import { useToast } from '../context/ToastContext.jsx';
-import { money, stars } from '../lib/format.js';
+import { Heart, Star, Truck } from '@phosphor-icons/react';
+import { money } from '../lib/format.js';
 import StockBadge from './StockBadge.jsx';
+import { Icon, ProductArt } from './Icons.jsx';
+import { tileStyle } from './Illustrations.jsx';
+
+// Star rating: the icon is decorative; screen readers get the full sentence.
+export function Rating({ product: p, className = 'rt' }) {
+  return (
+    <div className={className}>
+      <Icon as={Star} weight="fill" size={12} className="star" />{' '}
+      <span aria-hidden="true">{p.rating} · {p.reviewCount} reviews</span>
+      <span className="sr-only">Rated {p.rating} out of 5 from {p.reviewCount} reviews</span>
+    </div>
+  );
+}
+
+const ICON_SAVE = 20;
 
 export function SaveButton({ product, className = 'save' }) {
   const { savedIds, toggleSaved } = useShop();
@@ -12,7 +28,7 @@ export function SaveButton({ product, className = 'save' }) {
     <button type="button" className={className} aria-pressed={saved}
             aria-label={saved ? `Remove ${product.name} from saved items` : `Save ${product.name} for later`}
             onClick={() => { toggleSaved(product.id); toast(saved ? 'Removed from saved items' : 'Saved for later'); }}>
-      {saved ? '♥' : '♡'}
+      <Icon as={Heart} size={ICON_SAVE} weight={saved ? 'fill' : 'regular'} />
     </button>
   );
 }
@@ -23,16 +39,16 @@ export default function ProductCard({ product: p }) {
 
   return (
     <div className="card">
-      <Link to={`/product/${p.id}`} className="art" aria-label={p.name}>
+      <Link to={`/product/${p.id}`} className="art" aria-label={p.name} style={tileStyle(p.id)}>
         {p.tag && <span className="tag">{p.tag}</span>}
-        <span aria-hidden="true">{p.icon}</span>
+        <ProductArt name={p.icon} />
       </Link>
       <SaveButton product={p} />
       <div className="info">
         <Link to={`/product/${p.id}`} className="nm">{p.name}</Link>
-        <div className="rt">{stars(p)}</div>
+        <Rating product={p} />
         <div className="pr">{money(p.priceCents)}</div>
-        <div className="et">🚚 {p.eta}</div>
+        <div className="et"><Icon as={Truck} /> {p.eta}</div>
         <StockBadge stock={p.stock} />
         <button className="btn block" disabled={p.stock <= 0} onClick={() => toast(addToCart(p.id))}>
           {p.stock <= 0 ? 'Out of stock' : 'Add to cart'}

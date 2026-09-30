@@ -5,6 +5,9 @@ import { fmtRange, money, stockInfo } from '../lib/format.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useShop } from '../context/ShopContext.jsx';
+import { Icon } from '../components/Icons.jsx';
+import { ArrowClockwise, ArrowRight } from '@phosphor-icons/react';
+import { useDocumentTitle } from '../lib/useDocumentTitle.js';
 
 // Capped at 100%: e.g. a declined card then a retry logs consent twice for one checkout.
 const pct = (a, b) => (b ? Math.min(100, (a / b) * 100) : 0);
@@ -24,6 +27,7 @@ const REASONS = { damaged: 'Damaged', faulty: 'Faulty', missing_parts: 'Missing 
 
 export default function Admin() {
   const { user, ready } = useAuth();
+  useDocumentTitle('Analytics');
   const { refreshProducts } = useShop();
   const toast = useToast();
   const [data, setData] = useState(null);
@@ -53,7 +57,7 @@ export default function Admin() {
   const advance = async (o) => {
     try {
       await api(`/api/admin/orders/${o.id}/status`, { method: 'POST', body: { status: nextStatus(o.status) } });
-      toast(`#${o.id} → ${nextStatus(o.status)} · customer notified`);
+      toast(`Order #${o.id} is now ${nextStatus(o.status)}. Customer notified.`);
       load();
     } catch (err) { toast(err.message); }
   };
@@ -69,7 +73,7 @@ export default function Admin() {
   return (
     <>
       <div className="lead"><div><h1 className="serif">Analytics &amp; database</h1><p>Live figures read from the SQLite database · Part C Web Analytics</p></div>
-        <button className="link linkbtn" onClick={load}>Refresh ↻</button></div>
+        <button className="link linkbtn" onClick={load}>Refresh <Icon as={ArrowClockwise} size={12} /></button></div>
 
       <div className="kpi">
         <div className="box"><div className="n">{m.visits}</div><div className="l">Site visits</div></div>
@@ -103,8 +107,8 @@ export default function Admin() {
                 <td>{o.postcode} <span className="hint">{o.zone}</span></td><td>{fmtRange(o.estFrom, o.estTo)}</td>
                 <td>{o.paymentMethod}{o.cardLast4 ? ` ···· ${o.cardLast4}` : ''}</td><td>{o.guest ? 'Guest' : 'Account'}</td>
                 <td>{o.status}{nextStatus(o.status) && (
-                  <button className="linkbtn" style={{ display: 'block', color: 'var(--gold)', fontSize: 12 }} onClick={() => advance(o)}>
-                    Mark “{nextStatus(o.status)}” →
+                  <button className="linkbtn" style={{ display: 'block', color: 'var(--accent-text)', fontSize: 12 }} onClick={() => advance(o)}>
+                    Mark “{nextStatus(o.status)}” <Icon as={ArrowRight} size={12} />
                   </button>)}</td></tr>
             ))}</tbody>
           </table>
