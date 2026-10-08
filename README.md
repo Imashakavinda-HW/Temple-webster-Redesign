@@ -63,8 +63,8 @@ Then open **http://localhost:3001**.
 **Run the browser test + accessibility audit:** `npm run build`, then `npm run test:e2e`. The first time, also run `npx playwright install chromium` to download the test browser. It starts its own copy of the site on port 3107 with a throw-away database, runs 79 checks (shopping, checkout, MFA, admin, returns, privacy, both themes, keyboard, focus and phone sizes) and an axe WCAG 2.2 audit of 22 page views, then cleans up. Set `SCREENSHOTS=shots` to also save screenshots.
 
 **Add or change product photos:**
-1. Put photos in a folder called `photos` in the project root, named after the product: `sofa.jpg`, `dining-table.jpg`, `bed.jpg`, `bedside-tables.jpg`, `rattan-lounge.jpg`, `lamp.jpg`, `rug.jpg`, `office-chair.jpg`, `standing-desk.jpg`, and `hero.jpg` for the home-page banner.
-2. Run `npm run photos`. Each photo is cropped to a square around its most interesting part and saved as small and large WebP files in `client/public/images/`.
+1. Put photos in a folder called `photos` in the project root. Add the product name and two dashes to the **front** of each downloaded file name and keep the rest, which holds the photographer's name (for example `sofa--nathan-fertig-FBXuXp57eM0-unsplash.jpg`). Product names: `sofa`, `dining-table`, `bed`, `bedside-tables`, `rattan-lounge`, `lamp`, `rug`, `office-chair`, `standing-desk`, and `hero` for the home-page banner.
+2. Run `npm run photos`. Each photo is cropped to a square around its most interesting part and saved as small and large WebP files in `client/public/images/`. The credits page `docs/IMAGE-CREDITS.md` is written from the file names.
 3. Run `npm run build`, then `npm start`.
 
 Any product without a photo keeps its line drawing, so the site never shows a broken image. Credits for the included photos are in [`docs/IMAGE-CREDITS.md`](docs/IMAGE-CREDITS.md).

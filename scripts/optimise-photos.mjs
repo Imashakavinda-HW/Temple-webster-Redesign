@@ -1,16 +1,20 @@
-// Turns original photos into fast, web-ready images.
+// Turns original photos into fast, web-ready images, and writes the photo credits page.
 //
-//   1. Put photos in the `photos/` folder, named after the product they show:
-//        sofa.jpg  dining-table.jpg  bed.jpg  bedside-tables.jpg  rattan-lounge.jpg
-//        lamp.jpg  rug.jpg  office-chair.jpg  standing-desk.jpg  hero.jpg
-//      (.jpg, .jpeg, .png or .webp all work)
+//   1. Put photos in the `photos/` folder. Add the product name and two dashes to the
+//      FRONT of each downloaded file name (keep the rest, it holds the photographer's name):
+//        sofa--nathan-fertig-FBXuXp57eM0-unsplash.jpg
+//        lamp--pexels-fotoaibe-1571460.jpg
+//      Product names: sofa, dining-table, bed, bedside-tables, rattan-lounge, lamp, rug,
+//      office-chair, standing-desk, and hero (the home-page banner).
+//      A plain name like sofa.jpg also works (but then no credit can be recorded).
 //   2. Run: npm run photos
 //
 // Product photos are cropped to squares with "attention" cropping (keeps the most
 // interesting part of the picture in frame) and saved as WebP at 480px and 960px, so
 // phones download the small one and sharp screens the large one (UI/UX Pro Max:
 // image-optimization, responsive srcset). The home-page banner keeps its shape.
-// Output goes to client/public/images/, which Vite copies into the built site.
+// Output goes to client/public/images/ (Vite copies it into the built site), and
+// docs/IMAGE-CREDITS.md is rewritten from the file names.
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -19,19 +23,38 @@ import sharp from 'sharp';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const src = path.resolve(root, process.argv[2] || 'photos');
 const out = path.join(root, 'client/public/images');
-const PRODUCTS = ['sofa', 'dining-table', 'bed', 'bedside-tables', 'rattan-lounge', 'lamp', 'rug', 'office-chair', 'standing-desk'];
+const PRODUCTS = {
+  sofa: 'Hamptons Slip-Cover Sofa', 'dining-table': 'Solid Oak Dining Table', bed: 'Upholstered Linen Bed',
+  'bedside-tables': 'Bedside Tables (Pair)', 'rattan-lounge': 'Rattan Lounge Set', lamp: 'Ceramic Table Lamp',
+  rug: 'Hand-Tufted Wool Rug', 'office-chair': 'Ergonomic Studio Chair', 'standing-desk': 'Electric Standing Desk',
+};
 
 if (!fs.existsSync(src)) {
-  console.error(`No "${path.relative(root, src)}" folder found. Create it and add photos named e.g. sofa.jpg`);
+  console.error(`No "${path.relative(root, src)}" folder found. Create it and add photos named e.g. sofa--<original name>.jpg`);
   process.exit(1);
 }
 fs.mkdirSync(path.join(out, 'products'), { recursive: true });
 
 const files = fs.readdirSync(src).filter((f) => /\.(jpe?g|png|webp)$/i.test(f));
-const find = (slug) => files.find((f) => path.parse(f).name.toLowerCase() === slug);
-let done = 0;
+const find = (slug) => files.find((f) => {
+  const name = path.parse(f).name.toLowerCase();
+  return name === slug || name.startsWith(`${slug}--`);
+});
 
-for (const slug of PRODUCTS) {
+// Unsplash names files "firstname-lastname-PHOTOID-unsplash.jpg";
+// Pexels names them "pexels-username-12345.jpg". Read the credit from that.
+const titleCase = (s) => s.split('-').filter(Boolean).map((w) => w[0].toUpperCase() + w.slice(1)).join(' ');
+function creditFor(file) {
+  const rest = path.parse(file).name.split('--').slice(1).join('--');
+  let m = /^(.+)-([A-Za-z0-9_-]{11})-unsplash$/i.exec(rest);
+  if (m) return { who: titleCase(m[1]), where: `[Unsplash](https://unsplash.com/photos/${m[2]})`, licence: 'Unsplash License' };
+  m = /^pexels-(.+?)-(\d+)$/i.exec(rest);
+  if (m) return { who: m[1] === 'photo' ? 'Pexels contributor' : titleCase(m[1]), where: `[Pexels](https://www.pexels.com/photo/${m[2]}/)`, licence: 'Pexels License' };
+  return { who: 'Not recorded', where: rest ? `file: ${rest}` : 'not recorded', licence: 'check the source' };
+}
+
+const credits = [];
+for (const [slug, label] of Object.entries(PRODUCTS)) {
   const file = find(slug);
   if (!file) { console.log(`  - ${slug}: no photo yet (the line drawing will be shown)`); continue; }
   const { width, height } = await sharp(path.join(src, file)).metadata();
@@ -43,7 +66,7 @@ for (const slug of PRODUCTS) {
       .toFile(path.join(out, 'products', `${slug}-${size}.webp`));
   }
   console.log(`  ✓ ${slug}  (from ${file})`);
-  done++;
+  credits.push({ label, ...creditFor(file) });
 }
 
 const hero = find('hero');
@@ -55,9 +78,33 @@ if (hero) {
       .toFile(path.join(out, `hero-${width}.webp`));
   }
   console.log(`  ✓ hero  (from ${hero})`);
-  done++;
+  credits.push({ label: 'Home-page banner', ...creditFor(hero) });
 } else {
   console.log('  - hero: no photo yet (the drawing will be shown)');
 }
 
-console.log(`\n${done} photo(s) optimised into client/public/images. Run "npm run build" to include them in the built site.`);
+if (credits.length) {
+  const rows = credits.map((c) => `| ${c.label} | ${c.who} | ${c.where} | ${c.licence} |`).join('\n');
+  fs.writeFileSync(path.join(root, 'docs/IMAGE-CREDITS.md'), `# Image credits
+
+## Product and banner photos
+
+Free stock photos used under the **Unsplash License** (https://unsplash.com/license) or the **Pexels License** (https://www.pexels.com/license/). Both allow free use, including in commercial projects, without asking permission. Credit isn't legally required, but is given here as good practice. This page is generated by \`npm run photos\` from the photo file names.
+
+| Used for | Photographer | Source | Licence |
+|---|---|---|---|
+${rows}
+
+These photos show items similar to the prototype's products, not the exact products sold.
+
+## Line drawings
+
+The product line drawings (shown until a photo is added) are from the Hearth & Hollow reference design (\`docs/reference-hearth-and-hollow.html\`). The dining table, bedside pair, rattan lounge and standing desk were drawn to match.
+
+## Icons
+
+Interface icons come from **Phosphor Icons** (https://phosphoricons.com), MIT License.
+`);
+  console.log('\nCredits written to docs/IMAGE-CREDITS.md');
+}
+console.log(`\n${credits.length} photo(s) optimised into client/public/images. Run "npm run build" to include them in the built site.`);
