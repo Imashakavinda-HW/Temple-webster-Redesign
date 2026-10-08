@@ -1,22 +1,20 @@
 # One-off list of free photos to fetch. First working line per product is used;
 # the rest are fetched as previews only, so a better alternative can be swapped in.
 # (Unsplash blocks automated downloads, so these are all from Pexels.)
-# slug           source    id             (pexels only: photographer-name)
+# slug           source    id             photographer-name        optional crop=left,top,size
 sofa             pexels    4352247        maksim-goncharenok
 dining-table     pexels    4044798        curtis-adams
 bed              pexels    7598137        max-vakhtbovych
-bed              pexels    7535044        max-vakhtbovych
-bed              pexels    4993080        rachel-claire
-bedside-tables   pexels    10117722       keegan-checks
-bedside-tables   pexels    6510425        lachlan-ross
+bedside-tables   pexels    6316066        max-vakhtbovych
+bedside-tables   pexels    4440214        photo
+bedside-tables   pexels    545012         photo
+bedside-tables   pexels    4577650        rachel-claire
 bedside-tables   pexels    707579         cats-coming
 rattan-lounge    pexels    12881011       birkaybolushikayesi
 lamp             pexels    29252558       mateusz-pielech
-rug              pexels    6035357        photo
-rug              pexels    10168692       photo
-rug              pexels    2227832        photo
+lamp             pexels    242827         photo
+lamp             pexels    1643280        photo
+rug              pexels    10168692       photo                    crop=0,1278,1611
 office-chair     pexels    21325131       alpha-en
-office-chair     pexels    1957477        lisa-fotios
 standing-desk    pexels    8001034        pavel-danilyuk
-standing-desk    pexels    5301775        standsome-worklifestyle
 hero             pexels    6510974        curtis-adams

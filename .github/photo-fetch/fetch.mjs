@@ -14,7 +14,7 @@ const chosen = new Set();
 const count = {};
 const report = [];
 for (const line of lines) {
-  const [slug, source, id, who] = line.split(/\s+/);
+  const [slug, source, id, who, crop] = line.split(/\s+/);
   count[slug] = (count[slug] || 0) + 1;
   const tag = `${slug}-${count[slug]}-${id}`;
   try {
@@ -40,7 +40,12 @@ for (const line of lines) {
     const res = await fetch(url, { headers: { 'user-agent': UA } });
     const type = res.headers.get('content-type') || '';
     if (!res.ok || !type.startsWith('image/')) throw new Error(`HTTP ${res.status} ${type}`);
-    const buf = Buffer.from(await res.arrayBuffer());
+    let buf = Buffer.from(await res.arrayBuffer());
+    // Optional crop=left,top,size (pixels): frames the product when the photo is a wider scene.
+    if (crop?.startsWith('crop=')) {
+      const [left, top, size] = crop.slice(5).split(',').map(Number);
+      buf = await sharp(buf).rotate().extract({ left, top, width: size, height: size }).jpeg({ quality: 92 }).toBuffer();
+    }
     const { width, height } = await sharp(buf).metadata();
     await sharp(buf).rotate().resize({ width: 360 }).jpeg({ quality: 70 }).toFile(`photo-previews/${tag}-full.jpg`);
     await sharp(buf).rotate().resize(240, 240, { fit: 'cover', position: sharp.strategy.attention })
