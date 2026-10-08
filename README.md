@@ -60,14 +60,16 @@ Then open **http://localhost:3001**.
 
 **Run the automated tests:** `npm test` runs 15 API tests (security rules, checkout, stock, delivery, MFA, roles, privacy) against a throw-away database. Your demo data isn't touched.
 
-**Run the browser test + accessibility audit:** `npm run build`, then `npm run test:e2e`. The first time, also run `npx playwright install chromium` to download the test browser. It starts its own copy of the site on port 3107 with a throw-away database, runs 79 checks (shopping, checkout, MFA, admin, returns, privacy, both themes, keyboard, focus and phone sizes) and an axe WCAG 2.2 audit of 22 page views, then cleans up. Set `SCREENSHOTS=shots` to also save screenshots.
+**Run the browser test + accessibility audit:** `npm run build`, then `npm run test:e2e`. The first time, also run `npx playwright install chromium` to download the test browser. It starts its own copy of the site on port 3107 with a throw-away database, runs 85 checks (shopping, checkout, MFA, admin, returns, privacy, both themes, keyboard, focus and phone sizes) and an axe WCAG 2.2 audit of 22 page views, then cleans up. Set `SCREENSHOTS=shots` to also save screenshots.
+
+**Product photos:** the project comes with free photos from Pexels for all nine products and the home-page banner, each chosen to match its product description and checked by eye. Credits are in [`docs/IMAGE-CREDITS.md`](docs/IMAGE-CREDITS.md).
 
 **Add or change product photos:**
-1. Put photos in a folder called `photos` in the project root. Add the product name and two dashes to the **front** of each downloaded file name and keep the rest, which holds the photographer's name (for example `sofa--nathan-fertig-FBXuXp57eM0-unsplash.jpg`). Product names: `sofa`, `dining-table`, `bed`, `bedside-tables`, `rattan-lounge`, `lamp`, `rug`, `office-chair`, `standing-desk`, and `hero` for the home-page banner.
+1. Put photos in a folder called `photos` in the project root. Add the product name and two dashes to the **front** of each downloaded file name and keep the rest, which holds the photographer's name (for example `sofa--nathan-fertig-FBXuXp57eM0-unsplash.jpg` or `lamp--pexels-mateusz-pielech-29252558.jpg`). Product names: `sofa`, `dining-table`, `bed`, `bedside-tables`, `rattan-lounge`, `lamp`, `rug`, `office-chair`, `standing-desk`, and `hero` for the home-page banner.
 2. Run `npm run photos`. Each photo is cropped to a square around its most interesting part and saved as small and large WebP files in `client/public/images/`. The credits page `docs/IMAGE-CREDITS.md` is written from the file names.
 3. Run `npm run build`, then `npm start`.
 
-Any product without a photo keeps its line drawing, so the site never shows a broken image. Credits for the included photos are in [`docs/IMAGE-CREDITS.md`](docs/IMAGE-CREDITS.md).
+Any product without a photo keeps its line drawing, so the site never shows a broken image.
 
 **Reset everything:** stop the server, then run `npm run seed`. This wipes the database and re-seeds the products and the admin account. You can also use the **Reset demo data** button on the Analytics page.
 

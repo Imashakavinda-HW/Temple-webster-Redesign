@@ -269,7 +269,7 @@ The whole interface was audited with the open-source UI/UX Pro Max skill (119 UX
 - **Performance**: pages load on demand, and placeholder cards show while products load.
 - **Navigation**: the current page is highlighted; a breadcrumb; the Back button restores your scroll position.
 
-> **Say it like this:** "We audited the UI against a 119-rule UX checklist, fixed every gap, and proved it with an automated loop: 79 browser checks and zero WCAG 2.2 violations in both themes."
+> **Say it like this:** "We audited the UI against a 119-rule UX checklist, fixed every gap, and proved it with an automated loop: 85 browser checks and zero WCAG 2.2 violations in both themes."
 
 ---
 
@@ -292,6 +292,8 @@ Decisions:
 - **WebP in two sizes, 480 and 960px.** The browser downloads the small one on phones and the large one on sharp screens (`srcset`/`sizes`).
 - **Width and height attributes**, so the page reserves space and nothing jumps while photos load.
 - **Lazy loading** for photos further down the page. The first row and the product page photo load immediately.
+
+**Where the photos come from.** All ten photos (nine products plus the home-page banner) are free Pexels photos. Each was picked to match its product description (a white linen sofa on a timber frame, a timber bedside table with drawers, a ceramic lamp with a linen shade, a cream wool rug) and checked by eye after cropping. The rug photo is cropped from a wider living-room shot so the rug fills the frame. Every photographer is credited in `docs/IMAGE-CREDITS.md`, with a link to the original. The Pexels License allows free commercial use without asking; credit is given anyway as good practice.
 
 **Never a broken image.** The server only advertises a photo once its file exists, and if a photo fails to load, the line drawing appears instead.
 
@@ -317,7 +319,6 @@ Decisions:
 | The JWT secret is random per start (unless `JWT_SECRET` is set) | A secret stored in a secrets manager |
 | Rate limits and payment tokens are kept in memory | Redis, so they're shared across multiple servers |
 | No email verification at registration | Send a verification link before activating the account |
-| Product images are emoji (as in the original design) | Real photography served from a CDN |
 | Postcode zones are a simplified table; public holidays aren't counted | The carrier's zone file / API and a state holiday calendar |
 | Status updates and notifications are triggered manually by an admin | Courier tracking webhooks update statuses automatically |
-| Product photos are free stock photos, not the actual products sold | The supplier's own product photography |
+| Product photos are free stock photos, not the actual products sold | The supplier's own product photography, served from a CDN |

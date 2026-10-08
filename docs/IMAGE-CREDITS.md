@@ -17,7 +17,7 @@ Free stock photos used under the **Unsplash License** (https://unsplash.com/lice
 | Electric Standing Desk | Pavel Danilyuk | [Pexels](https://www.pexels.com/photo/8001034/) | Pexels License |
 | Home-page banner | Curtis Adams | [Pexels](https://www.pexels.com/photo/6510974/) | Pexels License |
 
-These photos show items similar to the prototype's products, not the exact products sold.
+These photos show items similar to the prototype's products, not the exact products sold. The rug photo is cropped from a wider living-room shot so the rug fills the frame. "Pexels contributor" means the photographer's name wasn't available when the photo was fetched; the link goes to the original photo page, which shows it.
 
 ## Line drawings
 

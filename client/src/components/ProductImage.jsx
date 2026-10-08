@@ -8,7 +8,8 @@ import { ProductArt } from './Icons.jsx';
 //  - image-dimension: width/height reserve the space, so nothing jumps while loading (CLS)
 //  - alt-text: a description where the photo carries meaning; empty where a label already exists
 // If a photo fails to load, it quietly falls back to the drawing instead of a broken icon.
-export default function ProductImage({ product, sizes = '(max-width: 720px) 50vw, 280px', eager = false, alt = '' }) {
+// The default `sizes` matches the product grid: one column on phones, two on small tablets, ~280px on desktop.
+export default function ProductImage({ product, sizes = '(max-width: 580px) calc(100vw - 32px), (max-width: 900px) 50vw, 280px', eager = false, alt = '' }) {
   const [failed, setFailed] = useState(false);
   if (!product.image || failed) return <ProductArt name={product.icon} />;
 

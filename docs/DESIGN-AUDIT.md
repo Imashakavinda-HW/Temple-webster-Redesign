@@ -51,7 +51,7 @@ The loop was repeated until every item passed: build, then the API tests, then t
 | Check | Result |
 |---|---|
 | API tests (`npm test`) | **15 / 15 pass** |
-| Browser end-to-end checks (shopping, checkout, MFA, admin, returns, privacy, themes, keyboard, focus, scroll, mobile) | **79 / 79 pass** |
+| Browser end-to-end checks (shopping, checkout, MFA, admin, returns, privacy, themes, keyboard, focus, scroll, mobile) | **85 / 85 pass** |
 | axe accessibility audit, WCAG 2.0/2.1/**2.2** A+AA plus best practice | **0 violations** on 15 Daylight pages and 7 Evening pages |
 | Emoji on screen | **None** |
 | No sideways scrolling at 375×812, 390×844 and 844×390 (landscape), 7 pages each | **Pass** |
