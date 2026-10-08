@@ -20,11 +20,19 @@ for (const line of lines) {
   try {
     let url, name;
     if (source === 'unsplash') {
-      const r = await fetch(`https://unsplash.com/photos/${id}/download?force=true&w=2000`, { redirect: 'manual', headers: { 'user-agent': UA } });
-      const loc = r.headers.get('location');
-      if (!loc || !new URL(loc).hostname.endsWith('images.unsplash.com')) throw new Error(`no free download (HTTP ${r.status}, location ${loc})`);
-      url = loc;
-      name = new URL(loc).searchParams.get('dl') || `unknown-${id}-unsplash.jpg`;
+      // Follow the download redirects by hand (they can be relative) until the image host.
+      let next = new URL(`https://unsplash.com/photos/${id}/download?force=true&w=2000`);
+      const hops = [];
+      for (let i = 0; i < 6 && next.hostname !== 'images.unsplash.com'; i++) {
+        const r = await fetch(next, { redirect: 'manual', headers: { 'user-agent': UA } });
+        const loc = r.headers.get('location');
+        hops.push(`${r.status} ${loc}`);
+        if (!loc) break;
+        next = new URL(loc, next);
+      }
+      if (next.hostname !== 'images.unsplash.com') throw new Error(`no free download: ${hops.join(' -> ')}`);
+      url = next;
+      name = next.searchParams.get('dl') || `unknown-${id}-unsplash.jpg`;
     } else {
       url = `https://images.pexels.com/photos/${id}/pexels-photo-${id}.jpeg?auto=compress&cs=tinysrgb&w=2000`;
       name = `pexels-${who}-${id}.jpg`;
