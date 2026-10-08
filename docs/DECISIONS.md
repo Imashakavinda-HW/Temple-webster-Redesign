@@ -285,7 +285,28 @@ Decisions:
 
 ---
 
-## Step 11: Known limitations (be upfront about these in your presentation)
+## Step 11: Product photos and design polish
+
+**Photos.** Each product has an `image` name in the database (schema v4). Photos go through `scripts/optimise-photos.mjs`:
+- **Square crops.** Shop product grids (including the real Temple & Webster's) use squares. "Attention" cropping keeps the most interesting part of the photo in frame.
+- **WebP in two sizes, 480 and 960px.** The browser downloads the small one on phones and the large one on sharp screens (`srcset`/`sizes`).
+- **Width and height attributes**, so the page reserves space and nothing jumps while photos load.
+- **Lazy loading** for photos further down the page. The first row and the product page photo load immediately.
+
+**Never a broken image.** The server only advertises a photo once its file exists, and if a photo fails to load, the line drawing appears instead.
+
+**Polish:**
+- the phone menu is now a proper **Menu** button (a disclosure: `aria-expanded`, closes on Escape or when a link is tapped)
+- "You may also like" on product pages
+- photo thumbnails in the cart
+- the product photo stays in view while you scroll the details (desktop)
+- a gentle zoom on hover, and a banner photo that sits below the headline on phones
+
+> **Say it like this:** "Photos are optimised automatically: square crops, modern WebP format, two sizes for different screens, and lazy loading. If a photo is ever missing, the site falls back to its line drawing instead of a broken image."
+
+---
+
+## Step 12: Known limitations (be upfront about these in your presentation)
 
 | Limitation | What production would do |
 |---|---|
@@ -299,5 +320,4 @@ Decisions:
 | Product images are emoji (as in the original design) | Real photography served from a CDN |
 | Postcode zones are a simplified table; public holidays aren't counted | The carrier's zone file / API and a state holiday calendar |
 | Status updates and notifications are triggered manually by an admin | Courier tracking webhooks update statuses automatically |
-| Product pictures are line drawings | Real product photography, with the drawings kept as loading placeholders |
-| On phones the menu wraps onto two rows | A slide-out menu (drawer) with a focus trap |
+| Product photos are free stock photos, not the actual products sold | The supplier's own product photography |

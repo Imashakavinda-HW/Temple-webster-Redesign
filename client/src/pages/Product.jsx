@@ -4,8 +4,9 @@ import { useToast } from '../context/ToastContext.jsx';
 import SecureBadge from '../components/SecureBadge.jsx';
 import StockBadge from '../components/StockBadge.jsx';
 import DeliveryEstimate from '../components/DeliveryEstimate.jsx';
-import { Rating, SaveButton } from '../components/ProductCard.jsx';
-import { Icon, ProductArt } from '../components/Icons.jsx';
+import ProductCard, { Rating, SaveButton } from '../components/ProductCard.jsx';
+import { Icon } from '../components/Icons.jsx';
+import ProductImage from '../components/ProductImage.jsx';
 import { tileStyle } from '../components/Illustrations.jsx';
 import { useDocumentTitle } from '../lib/useDocumentTitle.js';
 import { CaretRight } from '@phosphor-icons/react';
@@ -21,6 +22,11 @@ export default function Product() {
   if (loading) return <p className="hint" style={{ margin: '24px 0' }}>Loading…</p>;
   if (!p) return <div className="panel center"><h1 className="serif">Product not found</h1><Link className="btn" to="/">Back to collection</Link></div>;
 
+  // "You may also like": same room first, then other pieces, never this one or sold-out items.
+  const related = [...products.filter((x) => x.id !== p.id && x.category === p.category),
+    ...products.filter((x) => x.id !== p.id && x.category !== p.category)]
+    .filter((x) => x.stock > 0).slice(0, 4);
+
   return (
     <>
       <nav aria-label="Breadcrumb" className="crumbs">
@@ -31,10 +37,16 @@ export default function Product() {
         </ol>
       </nav>
       <div className="row">
-        <div className="col" style={{ flex: '0 0 46%' }}>
-          <div className="art big" role="img" aria-label={`Illustration of the ${p.name}`} style={tileStyle(p.id)}>
-            <ProductArt name={p.icon} />
-          </div>
+        <div className="col product-media" style={{ flex: '0 0 46%' }}>
+          {p.image ? (
+            <div className="art big has-photo" style={tileStyle(p.id)}>
+              <ProductImage product={p} eager sizes="(max-width: 720px) 100vw, 540px" alt={`${p.name}, product photo`} />
+            </div>
+          ) : (
+            <div className="art big" role="img" aria-label={`Illustration of the ${p.name}`} style={tileStyle(p.id)}>
+              <ProductImage product={p} />
+            </div>
+          )}
         </div>
         <div className="col">
           {p.tag && <span className="pill">{p.tag}</span>}
@@ -58,6 +70,13 @@ export default function Product() {
           </p>
         </div>
       </div>
+
+      {related.length > 0 && (
+        <section aria-labelledby="relatedTitle">
+          <div className="lead"><div><h2 className="serif" id="relatedTitle">You may also like</h2><p>More pieces for your {p.category.toLowerCase()} and beyond</p></div></div>
+          <div className="grid">{related.map((r) => <ProductCard key={r.id} product={r} />)}</div>
+        </section>
+      )}
     </>
   );
 }

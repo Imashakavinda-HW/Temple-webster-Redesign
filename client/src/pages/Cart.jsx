@@ -4,6 +4,8 @@ import { useToast } from '../context/ToastContext.jsx';
 import { useDeliveryEstimate, PostcodeInput } from '../components/DeliveryEstimate.jsx';
 import { fmtRange, money } from '../lib/format.js';
 import { Icon } from '../components/Icons.jsx';
+import ProductImage from '../components/ProductImage.jsx';
+import { tileStyle } from '../components/Illustrations.jsx';
 import { Check, Info, Truck } from '@phosphor-icons/react';
 import { useDocumentTitle } from '../lib/useDocumentTitle.js';
 
@@ -36,7 +38,10 @@ export default function Cart() {
             const eta = estimate?.items.find((i) => i.productId === id);
             return (
               <div className="cartline" key={id}>
-                <div>
+                <div className={`art thumb${product.image ? ' has-photo' : ''}`} style={tileStyle(id)} aria-hidden="true">
+                  <ProductImage product={product} sizes="72px" />
+                </div>
+                <div className="cartline-info">
                   <Link to={`/product/${id}`} className="nm">{product.name}</Link>
                   <div className="hint">{money(product.priceCents)} each</div>
                   <div className="hint" style={{ color: 'var(--success)' }}><Icon as={Truck} /> {eta ? `Arrives ${fmtRange(eta.from, eta.to)}` : product.eta}</div>

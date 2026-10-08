@@ -32,6 +32,9 @@ const products = [
     'A whisper-quiet electric height-adjustable desk with memory presets (140cm).'],
 ];
 
+// Photo file names (see scripts/optimise-photos.mjs). Until a photo exists, the drawing shows.
+const IMAGES = { 1: 'sofa', 2: 'dining-table', 3: 'bed', 4: 'bedside-tables', 5: 'rattan-lounge', 6: 'lamp', 7: 'rug', 8: 'office-chair', 9: 'standing-desk' };
+
 // Puts stock back to the seeded levels (used by the admin "Reset demo data" button).
 export function restoreStock() {
   const update = db.prepare('UPDATE products SET stock = ? WHERE id = ?');
@@ -50,10 +53,10 @@ export function seed({ reset = false } = {}) {
 
     if (db.prepare('SELECT COUNT(*) AS n FROM products').get().n === 0) {
       const insert = db.prepare(`INSERT INTO products
-        (id, name, category, price_cents, icon, eta_min, eta_max, stock, rating, review_count, tag, description)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+        (id, name, category, price_cents, icon, image, eta_min, eta_max, stock, rating, review_count, tag, description)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`);
       for (const [id, name, cat, dollars, icon, min, max, stock, rating, reviews, tag, desc] of products) {
-        insert.run(id, name, cat, dollars * 100, icon, min, max, stock, rating, reviews, tag, desc);
+        insert.run(id, name, cat, dollars * 100, icon, IMAGES[id], min, max, stock, rating, reviews, tag, desc);
       }
       console.log(`Seeded ${products.length} products.`);
     }

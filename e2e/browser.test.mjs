@@ -38,7 +38,9 @@ const focusedIsVisible = () => page.evaluate(() => {
 log('HOME & CATALOGUE');
 await page.goto(B); await page.waitForSelector('.card .nm');
 check(await page.locator('.card').count() === 9, '9 products');
-check(await page.locator('.card .art svg').count() === 9, 'product art is SVG (9 icons)');
+check(await page.locator('.card .art svg, .card .art img.photo').count() === 9, 'every product has a photo or drawing (9)');
+const photos = await page.locator('.card .art img.photo').evaluateAll((imgs) => imgs.map((i) => ({ ok: i.complete && i.naturalWidth > 0, w: i.getAttribute('width'), h: i.getAttribute('height'), srcset: !!i.srcset })));
+check(photos.every((p) => p.ok && p.w && p.h && p.srcset), `product photos load, reserve space and are responsive (${photos.length} photos)`);
 check(await page.locator('.rooms .room').count() === 5, 'shop-by-room: 5 rooms');
 check((await page.title()).startsWith('Temple & Webster'), 'home page title');
 check(await page.locator('.nav >> text=Analytics').count() === 0, 'Analytics hidden from guests');
@@ -192,7 +194,8 @@ await page.setViewportSize({ width: 1280, height: 900 });
 await page.goto(B); await page.waitForSelector('.card .nm');
 check(await page.evaluate(() => document.documentElement.dataset.theme) === 'light', 'Daylight (Hearth & Hollow) is the default theme');
 check(await page.evaluate(() => getComputedStyle(document.body).backgroundColor) === 'rgb(255, 255, 255)', 'Daylight background is white');
-check(await page.evaluate(() => getComputedStyle(document.querySelector('.card .art')).backgroundColor) === 'rgb(239, 231, 220)', 'product tile uses Hearth & Hollow tint');
+const plainTile = await page.evaluate(() => { const a = document.querySelector('.card:first-child .art:not(.has-photo)'); return a ? getComputedStyle(a).backgroundColor : 'all-photos'; });
+check(plainTile === 'rgb(239, 231, 220)' || plainTile === 'all-photos', 'drawing tiles use Hearth & Hollow tint (or every product has a photo)');
 await shot('11-daylight-home.png', true);
 await page.click('.theme-toggle');
 check((await page.getAttribute('.theme-toggle', 'aria-pressed')) === 'true', 'toggle reports pressed');
@@ -229,10 +232,23 @@ for (const [w, h] of [[375, 812], [390, 844], [844, 390]]) {
 await page.setViewportSize({ width: 390, height: 844 }); await page.goto(B + '/account'); await page.waitForSelector('#liEmail');
 check(await page.evaluate(() => parseFloat(getComputedStyle(document.getElementById('liEmail')).fontSize)) >= 16, 'mobile inputs ≥16px (no iOS zoom)');
 check(await page.evaluate(() => getComputedStyle(document.querySelector('header.top')).position) === 'static', 'mobile header not sticky');
+check(!(await page.locator('#mainMenu').isVisible()) && (await page.getAttribute('.menu-btn', 'aria-expanded')) === 'false', 'phone menu starts closed');
+await page.click('.menu-btn');
+check((await page.getAttribute('.menu-btn', 'aria-expanded')) === 'true' && await page.locator('#mainMenu a >> text=Track Order').isVisible() && await page.locator('#categoryMenu').isVisible(), 'Menu button opens links and categories');
+await page.keyboard.press('Escape');
+check(!(await page.locator('#mainMenu').isVisible()) && await page.evaluate(() => document.activeElement.classList.contains('menu-btn')), 'Escape closes the menu and returns focus to the button');
+await page.click('.menu-btn'); await page.click('#mainMenu >> text=Track Order'); await page.waitForURL(/track/);
+check(!(await page.locator('#mainMenu').isVisible()), 'menu closes after choosing a page');
+await page.goto(B + '/account'); await page.waitForSelector('#liEmail');
 const small = await page.evaluate(() => [...document.querySelectorAll('.nav a, .cats a, button, .qbtn')].filter((e) => e.offsetParent)
   .map((e) => e.getBoundingClientRect()).filter((r) => r.height < 44 || r.width < 24).length);
 check(small === 0, `mobile nav/buttons ≥44px tall (${small} too small)`);
-await page.goto(B); await shot(`10-mobile.png`); await audit('mobile-home');
+await page.goto(B); await page.waitForSelector('.card'); await page.waitForTimeout(300);
+check(await page.evaluate(() => {
+  const art = document.querySelector('.hero-art.has-photo'); if (!art) return true; // no banner photo yet
+  return art.getBoundingClientRect().top >= document.querySelector('.hero-in').getBoundingClientRect().bottom - 1;
+}), 'phone banner photo sits below the headline, never behind it');
+await shot(`10-mobile.png`); await audit('mobile-home');
 const rm = await browser.newContext({ reducedMotion: 'reduce', viewport: { width: 1280, height: 900 } });
 const rp = await rm.newPage(); await rp.goto(B); await rp.waitForSelector('.btn');
 check(await rp.evaluate(() => getComputedStyle(document.querySelector('.btn')).transitionDuration.split(',').every((d) => parseFloat(d) === 0)), 'reduced motion: transitions off');

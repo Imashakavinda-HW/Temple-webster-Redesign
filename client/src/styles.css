@@ -390,7 +390,69 @@ table.data th{color:var(--accent-text);font-weight:600;font-size:11px;letter-spa
   .rooms{grid-template-columns:repeat(3,1fr);gap:18px 10px}
   .room-name{font-size:13px}
 }
+/* ---------- Photos (UI/UX Pro Max: image-dimension, lazy-loading; square crops like the real T&W site) ---------- */
+.card .art{aspect-ratio:1/1}
+.art .photo{display:block;width:100%;height:100%;object-fit:cover;transition:transform 600ms var(--ease-out)}
+.art.has-photo{background:var(--surface-2);border-color:transparent}
+.card:hover .art .photo{transform:scale(1.05)}
+.card:hover .art.has-photo{border-color:transparent}
+.art.big{overflow:hidden}
+.room .circle{overflow:hidden}
+.room .circle .photo{width:100%;height:100%;object-fit:cover;border-radius:50%;transition:transform 600ms var(--ease-out)}
+.room:hover .circle .photo{transform:scale(1.06)}
+.hero-art.has-photo .photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+:root:not([data-theme="dark"]) .hero-art.has-photo{background:none}
+/* Evening: the banner photo fades into the dark background */
+:root[data-theme="dark"] .hero-art.has-photo{display:block;position:absolute;right:0;top:0;bottom:0;width:55%}
+:root[data-theme="dark"] .hero-art.has-photo .photo{filter:brightness(.7) saturate(.9)}
+:root[data-theme="dark"] .hero-art.has-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#0f0d0c 0%,rgba(15,13,12,.55) 35%,rgba(15,13,12,0) 70%)}
+/* Card polish: a clearer price/name hierarchy and a little more air */
+.card .info{padding:14px 2px 0}
+.card .btn.block{margin-top:4px}
+.grid{row-gap:36px}
+
+/* Cart thumbnails and product-page photo that stays in view while you read */
+.cartline .thumb{flex:0 0 72px;width:72px;height:72px;aspect-ratio:1;border-radius:var(--r);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;background:var(--art-bg);color:var(--art-fg)}
+:root:not([data-theme="dark"]) .cartline .thumb{background:var(--tint,var(--art-bg));color:var(--stroke,var(--art-fg))}
+.cartline .thumb svg{width:70%;height:auto}
+.cartline-info{flex:1;min-width:160px}
+@media(min-width:721px){.product-media{position:sticky;top:calc(var(--header-h) + 24px);align-self:flex-start}}
+
+/* ---------- Phone menu (disclosure pattern) ---------- */
+.mobile-actions{display:none}
+.menu-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border:1px solid var(--line-strong);border-radius:999px;
+  background:none;color:var(--text);font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.menu-btn[aria-expanded=true]{border-color:var(--accent-text);color:var(--accent-text)}
+.cart-mobile{position:relative;display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;color:var(--text)}
+.cart-mobile .badge{top:2px;right:-2px}
+@media(max-width:720px){
+  .mobile-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .logo{font-size:21px}
+  .wrap{padding:0 16px}
+  .menu-btn{padding:0 14px}
+  .topbar{gap:14px;padding:14px 0}
+  .nav{display:none;order:4;flex-basis:100%;flex-direction:column;align-items:stretch;gap:0}
+  .nav.open{display:flex}
+  .nav a,.nav .theme-toggle{padding:10px 4px;border-bottom:1px solid var(--line);border-radius:0;justify-content:flex-start}
+  .nav .theme-toggle{border-left:none;border-right:none;border-top:none;margin-top:0}
+  .nav .cartbtn{display:none}
+  .cats{display:none}
+  .cats.open{display:flex}
+}
+
+/* Narrow phones: logo, Cart and Menu share one row */
+@media(max-width:480px){.logo small{display:none}}
+
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{transition:none!important;scroll-behavior:auto!important}
   .skeleton .art,.sk-line{animation:none}
+}
+
+/* Phones: the banner photo sits in its own slot under the text, never behind it.
+   Kept last, with selectors as specific as the desktop rules, so it always wins. */
+@media(max-width:720px){
+  :root:not([data-theme="dark"]) .hero-art.has-photo,:root[data-theme="dark"] .hero-art.has-photo{
+    display:block;position:relative;inset:auto;width:100%;height:220px;order:2}
+  :root[data-theme="dark"] .hero-art.has-photo::after{background:linear-gradient(180deg,#0f0d0c 0%,rgba(15,13,12,0) 45%)}
 }

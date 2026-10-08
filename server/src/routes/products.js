@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { rateLimit } from 'express-rate-limit';
 import { db } from '../db.js';
 import { DELIVERY_OPTIONS, ZONES, estimateDelivery } from '../delivery.js';
@@ -11,6 +14,11 @@ export const PAYMENT_METHODS = {
   zip:      'Zip Pay',
 };
 
+// A product only advertises a photo once its optimised file exists, so the shop never shows
+// a broken image (the line drawing is used instead).
+const photoDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../client/public/images/products');
+const hasPhoto = (name) => !!name && /^[a-z-]+$/.test(name) && fs.existsSync(path.join(photoDir, `${name}-480.webp`));
+
 // Convert a database row (snake_case) to the JSON shape the front-end uses.
 export const toProduct = (r) => ({
   id: r.id,
@@ -18,6 +26,7 @@ export const toProduct = (r) => ({
   category: r.category,
   priceCents: r.price_cents,
   icon: r.icon,
+  image: hasPhoto(r.image) ? r.image : null,
   etaMin: r.eta_min,
   etaMax: r.eta_max,
   eta: `${r.eta_min}–${r.eta_max} business days`,
@@ -32,6 +41,11 @@ const router = Router();
 
 router.get('/products', (_req, res) => {
   res.json(db.prepare('SELECT * FROM products ORDER BY id').all().map(toProduct));
+});
+
+// Which optional site photos exist (so the page never requests a missing file).
+router.get('/media', (_req, res) => {
+  res.json({ hero: fs.existsSync(path.join(photoDir, '..', 'hero-960.webp')) });
 });
 
 router.get('/products/:id', (req, res) => {

@@ -1,19 +1,22 @@
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { api } from '../lib/api.js';
 import { ArrowCounterClockwise, ArrowRight, ChatCircle, LockSimple, Truck } from '@phosphor-icons/react';
 import { useShop } from '../context/ShopContext.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import { Icon } from '../components/Icons.jsx';
 import { Illustration } from '../components/Illustrations.jsx';
+import ProductImage, { HeroImage } from '../components/ProductImage.jsx';
 import { useDocumentTitle } from '../lib/useDocumentTitle.js';
 
 // "Shop by room": storytelling entry points, as the skill recommends for home-decor retail,
 // drawn as Hearth & Hollow-style round tiles.
 const ROOMS = [
-  { cat: 'Living', drawing: 'sofa', blurb: 'Sofas & dining' },
-  { cat: 'Bedroom', drawing: 'bed', blurb: 'Beds & bedside' },
-  { cat: 'Outdoor', drawing: 'outdoor', blurb: 'Alfresco living' },
-  { cat: 'Décor', drawing: 'lamp', blurb: 'Lighting & rugs' },
-  { cat: 'Office', drawing: 'chair', blurb: 'Work from home' },
+  { cat: 'Living', drawing: 'sofa', productId: 1, blurb: 'Sofas & dining' },
+  { cat: 'Bedroom', drawing: 'bed', productId: 3, blurb: 'Beds & bedside' },
+  { cat: 'Outdoor', drawing: 'outdoor', productId: 5, blurb: 'Alfresco living' },
+  { cat: 'Décor', drawing: 'lamp', productId: 6, blurb: 'Lighting & rugs' },
+  { cat: 'Office', drawing: 'chair', productId: 9, blurb: 'Work from home' },
 ];
 
 // Colour-block panels in the Hearth & Hollow "offer" style, carrying real promises this shop
@@ -36,6 +39,8 @@ function SkeletonCard() {
 
 export default function Home() {
   const { products, loading } = useShop();
+  const [heroPhoto, setHeroPhoto] = useState(false);
+  useEffect(() => { api('/api/media').then((m) => setHeroPhoto(m.hero)).catch(() => {}); }, []);
   const [params] = useSearchParams();
   const cat = params.get('cat') || 'all';
   const q = (params.get('q') || '').toLowerCase();
@@ -50,7 +55,9 @@ export default function Home() {
       {cat === 'all' && !q && (
         <>
           <section className="hero" aria-labelledby="heroTitle">
-            <div className="hero-art" aria-hidden="true"><Illustration name="sofa" strokeWidth={1.1} /></div>
+            <div className={`hero-art${heroPhoto ? ' has-photo' : ''}`} aria-hidden="true">
+              {heroPhoto ? <HeroImage fallback={<Illustration name="sofa" strokeWidth={1.1} />} /> : <Illustration name="sofa" strokeWidth={1.1} />}
+            </div>
             <div className="hero-in">
             <div className="eyebrow">The Autumn Collection</div>
             <h1 id="heroTitle">Considered pieces for a considered home.</h1>
@@ -77,7 +84,11 @@ export default function Home() {
               {ROOMS.map((r) => (
                 <li key={r.cat}>
                   <Link to={`/?cat=${encodeURIComponent(r.cat)}`} className="room">
-                    <span className="circle"><Illustration name={r.drawing} /></span>
+                    <span className="circle">{(() => {
+                      // A room shows its best-known product's photo, or the drawing until photos are added.
+                      const p = products.find((x) => x.id === r.productId);
+                      return p?.image ? <ProductImage product={p} sizes="150px" /> : <Illustration name={r.drawing} />;
+                    })()}</span>
                     <span className="room-name">{r.cat}</span>
                     <span className="hint">{r.blurb}</span>
                   </Link>
@@ -112,7 +123,7 @@ export default function Home() {
         </div>
         <div className="grid" aria-busy={loading}>
           {loading ? Array.from({ length: 6 }, (_, i) => <SkeletonCard key={i} />)
-            : items.length ? items.map((p) => <ProductCard key={p.id} product={p} />)
+            : items.length ? items.map((p, i) => <ProductCard key={p.id} product={p} eager={i < 4} />)
             : (
               <div className="panel center empty">
                 <p>No pieces match {q ? `“${params.get('q')}”` : 'this filter'}.</p>

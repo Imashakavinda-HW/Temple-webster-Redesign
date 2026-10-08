@@ -4,7 +4,8 @@ import { useToast } from '../context/ToastContext.jsx';
 import { Heart, Star, Truck } from '@phosphor-icons/react';
 import { money } from '../lib/format.js';
 import StockBadge from './StockBadge.jsx';
-import { Icon, ProductArt } from './Icons.jsx';
+import { Icon } from './Icons.jsx';
+import ProductImage from './ProductImage.jsx';
 import { tileStyle } from './Illustrations.jsx';
 
 // Star rating: the icon is decorative; screen readers get the full sentence.
@@ -33,15 +34,15 @@ export function SaveButton({ product, className = 'save' }) {
   );
 }
 
-export default function ProductCard({ product: p }) {
+export default function ProductCard({ product: p, eager = false }) {
   const { addToCart } = useShop();
   const toast = useToast();
 
   return (
     <div className="card">
-      <Link to={`/product/${p.id}`} className="art" aria-label={p.name} style={tileStyle(p.id)}>
+      <Link to={`/product/${p.id}`} className={`art${p.image ? ' has-photo' : ''}`} aria-label={p.name} style={tileStyle(p.id)}>
         {p.tag && <span className="tag">{p.tag}</span>}
-        <ProductArt name={p.icon} />
+        <ProductImage product={p} eager={eager} />
       </Link>
       <SaveButton product={p} />
       <div className="info">

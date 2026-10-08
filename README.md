@@ -62,6 +62,13 @@ Then open **http://localhost:3001**.
 
 **Run the browser test + accessibility audit:** `npm run build`, then `npm run test:e2e`. The first time, also run `npx playwright install chromium` to download the test browser. It starts its own copy of the site on port 3107 with a throw-away database, runs 79 checks (shopping, checkout, MFA, admin, returns, privacy, both themes, keyboard, focus and phone sizes) and an axe WCAG 2.2 audit of 22 page views, then cleans up. Set `SCREENSHOTS=shots` to also save screenshots.
 
+**Add or change product photos:**
+1. Put photos in a folder called `photos` in the project root, named after the product: `sofa.jpg`, `dining-table.jpg`, `bed.jpg`, `bedside-tables.jpg`, `rattan-lounge.jpg`, `lamp.jpg`, `rug.jpg`, `office-chair.jpg`, `standing-desk.jpg`, and `hero.jpg` for the home-page banner.
+2. Run `npm run photos`. Each photo is cropped to a square around its most interesting part and saved as small and large WebP files in `client/public/images/`.
+3. Run `npm run build`, then `npm start`.
+
+Any product without a photo keeps its line drawing, so the site never shows a broken image. Credits for the included photos are in [`docs/IMAGE-CREDITS.md`](docs/IMAGE-CREDITS.md).
+
 **Reset everything:** stop the server, then run `npm run seed`. This wipes the database and re-seeds the products and the admin account. You can also use the **Reset demo data** button on the Analytics page.
 
 ## 4. Demo walkthrough
@@ -135,6 +142,7 @@ Set these as environment variables before starting the server:
 │           └── admin.js        analytics, order status updates, returns queue (admin only)
 │   └── test/api.test.js    automated API tests (npm test)
 ├── e2e/                    browser test + accessibility audit (npm run test:e2e)
+├── scripts/optimise-photos.mjs  turns photos into web-ready images (npm run photos)
 └── client/
     ├── index.html, vite.config.js, public/theme-init.js (applies the saved theme before first paint)
     └── src/
