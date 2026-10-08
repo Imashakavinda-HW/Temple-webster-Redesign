@@ -1,0 +1,40 @@
+# One-off list of free photos to fetch. First working line per product is used;
+# the rest are fetched as previews only, so a better alternative can be swapped in.
+# slug           source    id             (pexels only: photographer-name)
+sofa             unsplash  IWfe63thJxk
+sofa             unsplash  ePcdyvazUWY
+sofa             unsplash  js8AQlw71HA
+sofa             unsplash  NTaF5rBmlyE
+dining-table     unsplash  d9iSRHiHNdk
+dining-table     unsplash  lGWmTzCyEB8
+dining-table     unsplash  idXQEOxhmvU
+dining-table     unsplash  O0vzxGRmjNs
+bed              unsplash  RUvW1KGD9a4
+bed              unsplash  mIurtZy_5RE
+bed              unsplash  CqVHT8g45R8
+bedside-tables   unsplash  Udy27z5xJGA
+bedside-tables   unsplash  PhwbTwdZ3f4
+rattan-lounge    unsplash  jDlTJSrjlgI
+rattan-lounge    unsplash  VbqBM3D-gzE
+rattan-lounge    unsplash  uKEUi2xd3IM
+rattan-lounge    unsplash  T2F0J6oKx7I
+lamp             unsplash  V8CSUtCP04E
+lamp             unsplash  WfrPa0oqcMA
+lamp             unsplash  pdIwPL3HU2s
+lamp             unsplash  Q0aEw-8ki-8
+lamp             pexels    1638503        min-an
+rug              unsplash  XQZwgyecGXk
+rug              unsplash  Pf57m5xWE5o
+rug              unsplash  Jxmz-TnwUGU
+rug              pexels    4846450        rachel-claire
+office-chair     unsplash  iUBsYaUIbXs
+office-chair     unsplash  hmCpPxmnDHw
+office-chair     unsplash  QHkRmvJRr8o
+office-chair     unsplash  O1dDKmhedWc
+standing-desk    unsplash  FxoQkT0jpUg
+standing-desk    unsplash  GCLbpAQ0XFM
+standing-desk    unsplash  a75qBS28vvo
+standing-desk    unsplash  At4mo3VXrdQ
+hero             unsplash  8R6wCppGu3I
+hero             unsplash  4YGsYQf7DNQ
+hero             unsplash  bJGBQj5cf6w
