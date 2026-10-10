@@ -19,6 +19,7 @@ Documents for your presentation:
 - **[`docs/COMPETITOR-ANALYSIS.md`](docs/COMPETITOR-ANALYSIS.md)**: how this compares with the real Temple & Webster site, with sources.
 - **[`docs/DESIGN-AUDIT.md`](docs/DESIGN-AUDIT.md)**: the UI/UX Pro Max skill audit, every rule applied, and the test-loop results.
 - **[`docs/DESIGN-SYSTEM.md`](docs/DESIGN-SYSTEM.md)**: colours, measured contrast, fonts, icons and the two themes.
+- **[`docs/PRESENTATION-GUIDE.md`](docs/PRESENTATION-GUIDE.md)**: for the 20-minute class presentation: set-up, timing, the demo click by click, likely questions with answers, and key terms.
 
 ---
 
@@ -121,7 +122,9 @@ Set these as environment variables before starting the server:
 │   ├── COMPETITOR-ANALYSIS.md  comparison with the real templeandwebster.com.au
 │   ├── DESIGN-AUDIT.md     UI/UX Pro Max skill audit and results
 │   ├── DESIGN-SYSTEM.md    tokens, contrast, fonts, icons, themes
-│   └── reference-hearth-and-hollow.html  colour and picture reference
+│   ├── PRESENTATION-GUIDE.md  presentation timing, demo script, Q&A, key terms
+│   ├── IMAGE-CREDITS.md    photographers and licences for the product photos
+│   ├── reference-hearth-and-hollow.html  colour and picture reference
 │   └── original-design.html the original single-file prototype
 ├── server/
 │   └── src/
